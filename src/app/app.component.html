@@ -1,0 +1,17 @@
+<m-table [value]=countries [width]="'300px'" [height]="'300px'"
+         [sortField]="'country'" [sortOrder]="1" (onSort)="changeSort($event)"
+         (onRowClick)="rowClick($event)"
+         [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows">
+  <m-column field="country" header="Country" [sortable]="true"></m-column>
+  <m-column field="capital" header="Capital" [sortable]="true"></m-column>
+  <m-column field="continent" header="Continent"></m-column>
+  <m-column field="flag" [sortable]="true">
+    <ng-template let-col mTemplate="header">
+      <button type="button" (click)="flagHeaderClick(col)">Falg</button>
+    </ng-template>
+    <ng-template let-col let-row="row" mTemplate="body">
+      <img [src]="row.flag" width="35px" (click)="flagClicked($event,row)"/>
+    </ng-template>
+  </m-column>
+</m-table>
+

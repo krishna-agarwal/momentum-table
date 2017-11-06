@@ -1,0 +1,94 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+.table-container{
+  overflow: scroll;
+  background: #fff;
+  display: inline-block !important;
+  padding: 0px !important;
+  font-family: Roboto,Helvetica Neue,sans-serif !important;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  position: relative;
+}
+th:not(:first-child),td:not(:first-child){
+  padding: 0px 28px;
+}
+th:first-child, td:first-child{
+  padding-left: 24px;
+}
+th:last-child, td:last-child{
+  padding-right: 24px;
+}
+th{
+  top: 0;
+  position: sticky;
+  background: #fff;
+  z-index: 1000;
+}
+
+tr {
+  border-top: 1px solid #e0e0e0;;
+  height: 47px;
+  transition: all 0.2s;
+}
+tr:hover{
+  background: #EEEEEE;
+}
+
+thead tr {
+  border-top: none !important;
+  text-align: left;
+  font-size: 12px;
+  height: 55px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.54);
+}
+thead tr:hover{
+  background: #fff;
+}
+
+tfoot tr {
+  text-align: left;
+  font-size: 12px;
+  height: 51px;
+  color: rgba(0, 0, 0, 0.54);;
+}
+tfoot tr:hover{
+  background: #fff;
+}
+
+//thead, tbody, tfoot{
+//  display: block;
+//}
+//
+//tbody{
+//  height: 100px;
+//  overflow-y: auto;
+//  overflow-x: hidden;
+//}
+
+.ui-checkbox-header{
+  width: 1%;
+  white-space: nowrap;
+}
+
+.ui-sortable-column {
+  cursor: pointer;
+}
+
+.ui-sortable-column-icon {
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.ui-row-selected{
+  background: #EEEEEE;
+}
+
+

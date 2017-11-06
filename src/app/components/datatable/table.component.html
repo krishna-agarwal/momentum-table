@@ -1,0 +1,8 @@
+<mat-card [ngStyle]="{'width': width, 'height': height}" class="table-container">
+  <table>
+    <thead [mColumnHeader]="columns"></thead>
+    <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>
+    <tbody [mTableBody]="columns" [value]="value"></tbody>
+  </table>
+</mat-card>
+

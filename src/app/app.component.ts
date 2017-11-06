@@ -58,4 +58,12 @@ export class AppComponent implements OnInit{
     console.log('flagClicked ==>', row);
     event.stopPropagation();
   }
+
+  rowExpanded(event){
+    console.log('expanded', event);
+  }
+
+  rowCollapse(event){
+    console.log('collapse', event);
+  }
 }

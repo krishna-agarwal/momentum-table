@@ -1,14 +1,43 @@
 import {
-  AfterContentInit, Component, ContentChildren, EventEmitter, forwardRef, HostListener, Inject, Input, NgModule, OnInit,
+  AfterContentInit, Component, ContentChildren, EmbeddedViewRef, EventEmitter, forwardRef, HostListener, Inject, Input,
+  NgModule, OnDestroy, OnInit,
   Output,
-  QueryList, ViewChild
+  QueryList, TemplateRef, ViewContainerRef
 } from '@angular/core';
-import {ColumnComponent, SharedModule} from '../common/shared';
+import {ColumnComponent, MomentumTemplate, SharedModule} from '../common/shared';
 import {CommonModule} from '@angular/common';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from '../common/material';
 import {DomHandler} from '../dom/domhandler';
-import {ObjectUtils} from "../util/objectutils";
+import {ObjectUtils} from '../util/objectutils';
+
+@Component({
+  selector: 'p-rowExpansionLoader',
+  template: ``
+})
+export class RowExpansionLoader implements OnInit, OnDestroy {
+
+  @Input() template: TemplateRef<any>;
+
+  @Input() rowData: any;
+
+  @Input() rowIndex: any;
+
+  view: EmbeddedViewRef<any>;
+
+  constructor(public viewContainer: ViewContainerRef) {}
+
+  ngOnInit() {
+    this.view = this.viewContainer.createEmbeddedView(this.template, {
+      '\$implicit': this.rowData,
+      'rowIndex': this.rowIndex
+    });
+  }
+
+  ngOnDestroy() {
+    this.view.destroy();
+  }
+}
 
 @Component({
   selector: '[mColumnHeader]',
@@ -25,6 +54,8 @@ import {ObjectUtils} from "../util/objectutils";
         </span>
         <span class="ui-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == -1">arrow_downward</span>
         <span class="ui-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == 1">arrow_upward</span>
+      </th>
+      <th *ngIf="dt.expandable == true" style="padding-left: 0px;">
       </th>
     </tr>
   `
@@ -46,6 +77,8 @@ export class ColumnHeaderComponent {
           <m-columnFooterTemplateLoader [column]="col"></m-columnFooterTemplateLoader>
         </span>
       </td>
+      <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
+      </td>
     </tr>
   `
 })
@@ -57,7 +90,8 @@ export class ColumnFooterComponent {
 @Component({
   selector: '[mTableBody]',
   template: `
-      <tr *ngFor="let row of value; let rowIndex = index;" (click)="dt.handleRowClick($event, row, rowIndex)" [ngClass]="[dt.isSelected(row)? 'ui-row-selected': '']">
+    <ng-template ngFor let-row [ngForOf]="value" let-even="even" let-odd="odd" let-rowIndex="index">
+      <tr (click)="dt.handleRowClick($event, row, rowIndex)" [ngClass]="[dt.isSelected(row)? 'ui-row-selected': '']">
         <td *ngIf="dt.selectionHandler == true">
           <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
         </td>
@@ -67,7 +101,19 @@ export class ColumnFooterComponent {
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
           </span>
         </td>
+        <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
+          <span class="ui-expand-icon material-icons" (click)="dt.toggleRow(row, $event)">
+            <i class="material-icons ui-clickable" *ngIf="!dt.isRowExpanded(row)">keyboard_arrow_right</i>
+            <i class="material-icons ui-clickable" *ngIf="dt.isRowExpanded(row)">keyboard_arrow_down</i>
+          </span>
+        </td>
       </tr>
+      <tr *ngIf="dt.expandable && dt.isRowExpanded(row)" class="ui-expanded-row-content">
+        <td [attr.colspan]="dt.totalColumns()">
+          <p-rowExpansionLoader [rowData]="row" [rowIndex]="rowIndex" [template]="dt.expansionTemplate"></p-rowExpansionLoader>
+        </td>
+      </tr>
+    </ng-template>
   `
 })
 export class TableBodyComponent {
@@ -105,13 +151,27 @@ export class DataTable implements OnInit, AfterContentInit {
 
   @Output() onRowUnselect: EventEmitter<any> = new EventEmitter();
 
+  @Input() expandable: boolean = false;
+
+  @Input() expandedRows: any[];
+
+  @Input() expandMultiple: boolean = true;
+
+  @Output() onRowExpand: EventEmitter<any> = new EventEmitter();
+
+  @Output() onRowCollapse: EventEmitter<any> = new EventEmitter();
+
   @ContentChildren(ColumnComponent) cols: QueryList<ColumnComponent>;
+
+  @ContentChildren(MomentumTemplate) templates: QueryList<MomentumTemplate>;
 
   public columns: ColumnComponent[];
 
   public sortColumn: ColumnComponent;
 
   public preventRowClickPropagation: boolean;
+
+  public expansionTemplate: TemplateRef<any>;
 
   _sortField: string;
 
@@ -126,6 +186,14 @@ export class DataTable implements OnInit, AfterContentInit {
 
   ngAfterContentInit() {
     this.initColumns();
+
+    this.templates.forEach((item) => {
+      switch(item.getType()) {
+        case 'expansion':
+          this.expansionTemplate = item.template;
+          break;
+      }
+    });
   }
 
   @Input() get sortField(): string{
@@ -176,6 +244,14 @@ export class DataTable implements OnInit, AfterContentInit {
     else {
       return null;
     }
+  }
+
+  visibleColumns() {
+    return this.columns ? this.columns.filter(c => !c.hidden): [];
+  }
+
+  totalColumns() {
+    return this.visibleColumns().length + (this.expandable ? 1: 0) + (this.selectionHandler ? 1 : 0);
   }
 
   hasFooter() {
@@ -247,13 +323,16 @@ export class DataTable implements OnInit, AfterContentInit {
 
   handleRowClick(event: MouseEvent, rowData: any, index: number) {
 
-    this.onRowClick.emit({originalEvent: event, data: rowData});
-
     const targetNode = (<HTMLElement> event.target).nodeName;
 
-    if(targetNode === 'INPUT' || targetNode === 'BUTTON' || targetNode === 'A' || this.selectionHandler === true) {
+    if(targetNode === 'INPUT' || targetNode === 'BUTTON' || targetNode === 'A' || (this.domHandler.hasClass(event.target, 'ui-clickable'))) {
       return;
     }
+
+    this.onRowClick.emit({originalEvent: event, data: rowData});
+
+    if(this.selectionHandler === true)
+      return;
 
     if(this.selectable) {
       const selected = this.isSelected(rowData);
@@ -365,12 +444,59 @@ export class DataTable implements OnInit, AfterContentInit {
     return val;
   }
 
+  toggleRow(row: any, event?: Event) {
+    if(!this.expandedRows) {
+      this.expandedRows = [];
+    }
+
+    let expandedRowIndex = this.findExpandedRowIndex(row);
+
+    if(expandedRowIndex != -1) {
+      this.expandedRows.splice(expandedRowIndex, 1);
+      this.onRowCollapse.emit({
+        originalEvent: event,
+        data: row
+      });
+    }else {
+      if(!this.expandMultiple) {
+        this.expandedRows = [];
+      }
+
+      this.expandedRows.push(row);
+      this.onRowExpand.emit({
+        originalEvent: event,
+        data: row
+      });
+    }
+
+    if(event) {
+      event.preventDefault();
+    }
+  }
+
+  findExpandedRowIndex(row: any): number {
+    let index = -1;
+    if(this.expandedRows) {
+      for(let i = 0; i < this.expandedRows.length; i++) {
+        if(this.expandedRows[i] == row) {
+          index = i;
+          break;
+        }
+      }
+    }
+    return index;
+  }
+
+  isRowExpanded(row: any): boolean {
+    return this.findExpandedRowIndex(row) != -1;
+  }
+
 }
 
 @NgModule({
   imports: [CommonModule, MaterialModule, BrowserAnimationsModule, SharedModule],
   exports: [DataTable, ColumnHeaderComponent, ColumnFooterComponent, TableBodyComponent, SharedModule],
   providers: [DomHandler, ObjectUtils],
-  declarations: [DataTable, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent]
+  declarations: [DataTable, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, RowExpansionLoader]
 })
 export class TableModule { }

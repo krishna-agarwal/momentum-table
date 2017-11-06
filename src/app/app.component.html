@@ -1,7 +1,8 @@
-<m-table [value]=countries [width]="'300px'" [height]="'300px'"
+<m-table [value]=countries
          [sortField]="'country'" [sortOrder]="1" (onSort)="changeSort($event)"
          (onRowClick)="rowClick($event)"
-         [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows">
+         [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows"
+         [expandable]="true" [expandMultiple]="false" (onRowExpand)="rowExpanded($event)" (onRowCollapse)="rowCollapse($event)">
   <m-column field="country" header="Country" [sortable]="true"></m-column>
   <m-column field="capital" header="Capital" [sortable]="true"></m-column>
   <m-column field="continent" header="Continent"></m-column>
@@ -13,5 +14,10 @@
       <img [src]="row.flag" width="35px" (click)="flagClicked($event,row)"/>
     </ng-template>
   </m-column>
+  <ng-template let-row let-index="rowIndex" mTemplate="expansion">
+    {{index}} - {{row.country}}
+    <br>
+    <img [src]="row.flag" width="100px" style="padding: 20px 0px;">
+  </ng-template>
 </m-table>
 

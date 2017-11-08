@@ -2,7 +2,7 @@ import {
   AfterContentInit, Component, ContentChildren, EmbeddedViewRef, EventEmitter, forwardRef, HostListener, Inject, Input,
   NgModule, OnDestroy, OnInit,
   Output,
-  QueryList, TemplateRef, ViewContainerRef
+  QueryList, Renderer2, TemplateRef, ViewContainerRef
 } from '@angular/core';
 import {ColumnComponent, MomentumTemplate, SharedModule} from '../common/shared';
 import {CommonModule} from '@angular/common';
@@ -10,6 +10,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from '../common/material';
 import {DomHandler} from '../dom/domhandler';
 import {ObjectUtils} from '../util/objectutils';
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'p-rowExpansionLoader',
@@ -95,11 +96,20 @@ export class ColumnFooterComponent {
         <td *ngIf="dt.selectionHandler == true">
           <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
         </td>
-        <td *ngFor="let col of columns">
-          <span *ngIf="!col.bodyTemplate">{{row[col.field]}}</span>
-          <span *ngIf="col.bodyTemplate">
+        <td #cell *ngFor="let col of columns" [ngClass]="{'ui-editable-column':col.editable, 'ui-clickable':col.editable}" (click)="dt.switchCellToEditMode(cell,col,row)">
+          <span class="ui-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'ui-clickable':col.editable}">{{row[col.field]}}</span>
+          <span class="ui-cell-data" *ngIf="col.bodyTemplate">
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
           </span>
+          <div class="ui-cell-editor" *ngIf="col.editable">
+            <mat-card matInput class="ui-input-card" *ngIf="!col.editorTemplate">
+              <mat-form-field class="ui-input-form">
+                <input matInput [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)" 
+                       (keydown)="dt.onCellEditorKeydown($event, col, row, rowIndex)" (blur)="dt.onCellEditorBlur($event, col, row, rowIndex)"
+                       (input)="dt.onCellEditorInput($event, col, row, rowIndex)">
+              </mat-form-field>
+            </mat-card>
+          </div>
         </td>
         <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
           <span class="ui-expand-icon material-icons" (click)="dt.toggleRow(row, $event)">
@@ -161,6 +171,14 @@ export class DataTable implements OnInit, AfterContentInit {
 
   @Output() onRowCollapse: EventEmitter<any> = new EventEmitter();
 
+  @Output() onEditInit: EventEmitter<any> = new EventEmitter();
+
+  @Output() onEditComplete: EventEmitter<any> = new EventEmitter();
+
+  @Output() onEdit: EventEmitter<any> = new EventEmitter();
+
+  @Output() onEditCancel: EventEmitter<any> = new EventEmitter();
+
   @ContentChildren(ColumnComponent) cols: QueryList<ColumnComponent>;
 
   @ContentChildren(MomentumTemplate) templates: QueryList<MomentumTemplate>;
@@ -173,13 +191,21 @@ export class DataTable implements OnInit, AfterContentInit {
 
   public expansionTemplate: TemplateRef<any>;
 
+  public editorClick: boolean;
+
+  public editingCell: any;
+
+  public documentEditListener: Function;
+
   _sortField: string;
 
   _sortOrder: number = 1;
 
   _selection: any;
 
-  constructor(public domHandler: DomHandler, public objectUtils: ObjectUtils) { }
+  editChanged: boolean;
+
+  constructor(public domHandler: DomHandler, public objectUtils: ObjectUtils, public renderer: Renderer2) { }
 
   ngOnInit() {
   }
@@ -491,10 +517,121 @@ export class DataTable implements OnInit, AfterContentInit {
     return this.findExpandedRowIndex(row) != -1;
   }
 
+  findCell(element) {
+    if(element) {
+      let cell = element;
+      while(cell && cell.tagName != 'TD') {
+        cell = cell.parentElement;
+      }
+
+      return cell;
+    }
+    else {
+      return null;
+    }
+  }
+
+  switchCellToEditMode(cell: any, column: ColumnComponent, rowData: any) {
+    if(column.editable){
+      this.editorClick = true;
+      this.bindDocumentEditListener();
+
+      if(cell != this.editingCell) {
+        if(this.editingCell && this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty').length == 0) {
+          this.domHandler.removeClass(this.editingCell, 'ui-cell-editing');
+        }
+
+        this.editingCell = cell;
+        this.onEditInit.emit({column: column, data: rowData});
+        this.domHandler.addClass(cell, 'ui-cell-editing');
+        let focusable = this.domHandler.findSingle(cell, '.ui-cell-editor input');
+        if(focusable) {
+          setTimeout(() => this.domHandler.invokeElementMethod(focusable, 'focus'), 50);
+        }
+      }
+
+    }
+  }
+
+  switchCellToViewMode(element: any) {
+    this.editingCell = null;
+    let cell = this.findCell(element);
+    this.domHandler.removeClass(cell, 'ui-cell-editing');
+    this.unbindDocumentEditListener();
+  }
+
+  closeCell() {
+    if(this.editingCell) {
+      this.domHandler.removeClass(this.editingCell, 'ui-cell-editing');
+      this.editingCell = null;
+      this.unbindDocumentEditListener();
+    }
+  }
+
+  bindDocumentEditListener() {
+    if(!this.documentEditListener) {
+      this.documentEditListener = this.renderer.listen('document', 'click', (event) => {
+        if(!this.editorClick) {
+          this.closeCell();
+        }
+        this.editorClick = false;
+      });
+    }
+  }
+
+  unbindDocumentEditListener() {
+    if(this.documentEditListener) {
+      this.documentEditListener();
+      this.documentEditListener = null;
+    }
+  }
+
+  onCellEditorKeydown(event, column: ColumnComponent, rowData: any, rowIndex: number) {
+    if(column.editable) {
+      //enter
+      if(event.keyCode == 13) {
+        if(this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty').length == 0) {
+          this.switchCellToViewMode(event.target);
+          event.preventDefault();
+        }
+      }
+
+      //escape
+      else if(event.keyCode == 27) {
+        this.switchCellToViewMode(event.target);
+        event.preventDefault();
+      }
+
+    }
+  }
+
+  onCellEditorInput(event, column: ColumnComponent, rowData: any, rowIndex: number) {
+    if(column.editable) {
+      this.onEdit.emit({originalEvent: event, column: column, data: rowData, index: rowIndex});
+    }
+  }
+
+  onCellEditorChange(event, column: ColumnComponent, rowData: any, rowIndex: number) {
+    if(column.editable) {
+      this.editChanged = true;
+
+      this.onEditComplete.emit({column: column, data: rowData, index: rowIndex});
+    }
+  }
+
+  onCellEditorBlur(event, column: ColumnComponent, rowData: any, rowIndex: number) {
+    if(column.editable) {
+      if(this.editChanged)
+        this.editChanged = false;
+      else
+        this.onEditCancel.emit({column: column, data: rowData, index: rowIndex});
+    }
+  }
+
 }
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, BrowserAnimationsModule, SharedModule],
+  imports: [CommonModule, MaterialModule, BrowserAnimationsModule, SharedModule, FormsModule],
   exports: [DataTable, ColumnHeaderComponent, ColumnFooterComponent, TableBodyComponent, SharedModule],
   providers: [DomHandler, ObjectUtils],
   declarations: [DataTable, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, RowExpansionLoader]

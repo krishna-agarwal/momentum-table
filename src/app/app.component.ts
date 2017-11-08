@@ -27,7 +27,7 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit(){
-    this.selectedRows = [{'country': 'India', 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'https://www.countries-ofthe-world.com/flags-normal/flag-of-India.png'}];
+    this.selectedRows = [{'country': 'India', 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'}];
   }
 
   changeSort(event) {
@@ -65,5 +65,25 @@ export class AppComponent implements OnInit{
 
   rowCollapse(event){
     console.log('collapse', event);
+  }
+
+  editInit(event){
+    console.log('edit Init');
+    console.log(event);
+  }
+
+  editComplete(event){
+    console.log('edit complete')
+    console.log(event);
+  }
+
+  edit(event){
+    console.log('Edit');
+    console.log(event);
+  }
+
+  editCancel(event){
+    console.log('edit cancel');
+    console.log(event);
   }
 }

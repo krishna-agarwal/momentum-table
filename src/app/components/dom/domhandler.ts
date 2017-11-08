@@ -24,4 +24,16 @@ export class DomHandler {
       return new RegExp('(^| )' + className + '( |$)', 'gi').test(element.className);
   }
 
+  public find(element: any, selector: string): any[] {
+    return element.querySelectorAll(selector);
+  }
+
+  public findSingle(element: any, selector: string): any {
+    return element.querySelector(selector);
+  }
+
+  public invokeElementMethod(element: any, methodName: string, args?: any[]): void {
+    (element as any)[methodName].apply(element, args);
+  }
+
 }

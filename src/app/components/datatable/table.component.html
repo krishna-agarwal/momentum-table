@@ -1,4 +1,4 @@
-<mat-card [ngStyle]="{'width': width, 'height': height}" class="table-container">
+<mat-card [ngClass]="{'ui-datatable ui-widget':true}" [ngStyle]="{'width': width, 'height': height}" class="table-container">
   <table>
     <thead [mColumnHeader]="columns"></thead>
     <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>

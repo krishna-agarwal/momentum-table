@@ -24,7 +24,7 @@ export class MomentumTemplate{
   template: ``
 })
 export class ColumnComponent implements AfterContentInit{
-  @Input() field;
+  @Input() field: string;
   @Input() header: string;
   @Input() footer: string;
   @Input() sortable: boolean;
@@ -37,6 +37,7 @@ export class ColumnComponent implements AfterContentInit{
   public headerTemplate: TemplateRef<any>;
   public bodyTemplate: TemplateRef<any>;
   public footerTemplate: TemplateRef<any>;
+  public editorTemplate: TemplateRef<any>;
 
   constructor() {
   }
@@ -54,6 +55,10 @@ export class ColumnComponent implements AfterContentInit{
 
         case 'footer':
           this.footerTemplate = item.template;
+          break;
+
+        case 'editor':
+          this.editorTemplate = item.template;
           break;
 
         default:
@@ -150,9 +155,38 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
   }
 }
 
+@Component({
+  selector: 'm-columnEditorTemplateLoader',
+  template: ``
+})
+export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
+
+  @Input() column: any;
+
+  @Input() row: any;
+
+  @Input() rowIndex: any;
+
+  view: EmbeddedViewRef<any>;
+
+  constructor(public viewContainer: ViewContainerRef) {}
+
+  ngOnInit() {
+    this.view = this.viewContainer.createEmbeddedView(this.column.editorTemplate, {
+      '\$implicit': this.column,
+      'row': this.row,
+      'rowIndex': this.rowIndex
+    });
+  }
+
+  ngOnDestroy() {
+    this.view.destroy();
+  }
+}
+
 @NgModule({
   imports: [CommonModule],
-  exports: [ColumnComponent, MomentumTemplate, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader],
-  declarations: [ColumnComponent, MomentumTemplate, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader]
+  exports: [ColumnComponent, MomentumTemplate, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader],
+  declarations: [ColumnComponent, MomentumTemplate, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
 })
 export class SharedModule { }

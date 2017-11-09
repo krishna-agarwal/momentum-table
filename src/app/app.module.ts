@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import {TableModule} from './components/datatable/datatable';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -10,7 +11,8 @@ import {TableModule} from './components/datatable/datatable';
   ],
   imports: [
     BrowserModule,
-    TableModule
+    TableModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

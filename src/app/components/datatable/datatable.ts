@@ -56,7 +56,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
         <span class="ui-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == -1">arrow_downward</span>
         <span class="ui-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == 1">arrow_upward</span>
       </th>
-      <th *ngIf="dt.expandable == true" style="padding-left: 0px;">
+      <th *ngIf="dt.expandable == true" style="padding-left: 0px;" class="ui-expand-header">
       </th>
     </tr>
   `
@@ -101,7 +101,7 @@ export class ColumnFooterComponent {
           <span class="ui-cell-data" *ngIf="col.bodyTemplate">
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
           </span>
-          <div class="ui-cell-editor" *ngIf="col.editable">
+          <div class="ui-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable">
             <mat-card matInput class="ui-input-card" *ngIf="!col.editorTemplate">
               <mat-form-field class="ui-input-form">
                 <input matInput [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)" 
@@ -109,6 +109,7 @@ export class ColumnFooterComponent {
                        (input)="dt.onCellEditorInput($event, col, row, rowIndex)">
               </mat-form-field>
             </mat-card>
+            <m-columnEditorTemplateLoader *ngIf="col.editorTemplate" (click)="$event.stopPropagation()" [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnEditorTemplateLoader>
           </div>
         </td>
         <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
@@ -532,7 +533,7 @@ export class DataTable implements OnInit, AfterContentInit {
   }
 
   switchCellToEditMode(cell: any, column: ColumnComponent, rowData: any) {
-    if(column.editable){
+    if(column.editable && !this.editorClick){
       this.editorClick = true;
       this.bindDocumentEditListener();
 
@@ -625,6 +626,8 @@ export class DataTable implements OnInit, AfterContentInit {
         this.editChanged = false;
       else
         this.onEditCancel.emit({column: column, data: rowData, index: rowIndex});
+
+      // this.closeCell();
     }
   }
 

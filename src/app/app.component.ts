@@ -56,7 +56,6 @@ export class AppComponent implements OnInit{
 
   flagClicked(event, row){
     console.log('flagClicked ==>', row);
-    event.stopPropagation();
   }
 
   rowExpanded(event){

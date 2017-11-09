@@ -7,12 +7,18 @@
   <m-column field="country" header="Country" [sortable]="true" [editable]="true"></m-column>
   <m-column field="capital" header="Capital" [sortable]="true"></m-column>
   <m-column field="continent" header="Continent"></m-column>
-  <m-column field="flag" [sortable]="true">
+  <m-column field="flag" [sortable]="true" [editable]="true">
     <ng-template let-col mTemplate="header">
       <button type="button" (click)="flagHeaderClick(col)">Falg</button>
     </ng-template>
     <ng-template let-col let-row="row" mTemplate="body">
       <img [src]="row.flag" width="35px" (click)="flagClicked($event,row)"/>
+    </ng-template>
+    <ng-template let-col let-row="row" mTemplate="editor">
+      <div style="background: gray; padding: 10px">
+        <img [src]="row.flag" width="100%">
+        <input [(ngModel)]="row[col.field]">
+      </div>
     </ng-template>
   </m-column>
   <ng-template let-row let-index="rowIndex" mTemplate="expansion">

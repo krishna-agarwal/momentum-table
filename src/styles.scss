@@ -8,7 +8,7 @@
   padding: 0px !important;
   font-family: Roboto,Helvetica Neue,sans-serif !important;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.87);;
+  color: rgba(0, 0, 0, 0.87);
 }
 table {
   width: 100%;
@@ -33,7 +33,7 @@ th{
   top: 0;
   position: sticky;
   background: #fff;
-  z-index: 1000;
+  z-index: 2000;
 }
 td{
   position: relative;
@@ -80,7 +80,7 @@ tfoot tr:hover{
 //  overflow-x: hidden;
 //}
 
-.ui-checkbox-header{
+.ui-checkbox-header, .ui-expand-header{
   width: 1%;
   white-space: nowrap;
 }
@@ -108,14 +108,19 @@ tfoot tr:hover{
 .ui-input-card{
   background: #f7f7f7;
   padding: 0px 0px !important;
-  position: absolute !important;
   top: 0px !important;
   //width: 100% !important;
 }
 
 .ui-input-form{
-  width: auto;
+  width: 150px;
   padding: 0px 12px;
+}
+
+.ui-cell-editor{
+  position: absolute !important;
+  z-index: 1000 !important;
+  top: 0 !important;
 }
 
 .ui-datatable .ui-editable-column > .ui-cell-editor {

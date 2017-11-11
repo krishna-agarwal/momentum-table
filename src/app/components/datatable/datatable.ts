@@ -1,10 +1,11 @@
 import {
-  AfterContentInit, Component, ContentChildren, EmbeddedViewRef, EventEmitter, forwardRef, HostListener, Inject, Input,
+  AfterContentInit, Component, ContentChild, ContentChildren, EmbeddedViewRef, EventEmitter, forwardRef, HostListener,
+  Inject, Input,
   NgModule, OnDestroy, OnInit,
   Output,
   QueryList, Renderer2, TemplateRef, ViewContainerRef
 } from '@angular/core';
-import {ColumnComponent, MomentumTemplate, SharedModule} from '../common/shared';
+import {ColumnComponent, Footer, Header, MomentumTemplate, SharedModule} from '../common/shared';
 import {CommonModule} from '@angular/common';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from '../common/material';
@@ -38,6 +39,32 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.view.destroy();
   }
+}
+
+@Component({
+  selector: '[mHeader]',
+  template: `
+    <div class="table-header">
+      <span class="table-header-title">{{header.title}}</span>
+    </div>
+  `
+})
+export class HeaderComponent {
+  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
+  @Input('mHeader') header: Header;
+}
+
+@Component({
+  selector: '[mFooter]',
+  template: `
+    <div class="table-footer">
+      Hello
+    </div>
+  `
+})
+export class FooterComponent {
+  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
+  @Input('mFooter') footer: Footer;
 }
 
 @Component({
@@ -183,6 +210,10 @@ export class DataTable implements OnInit, AfterContentInit {
   @ContentChildren(ColumnComponent) cols: QueryList<ColumnComponent>;
 
   @ContentChildren(MomentumTemplate) templates: QueryList<MomentumTemplate>;
+
+  @ContentChild(Header) header;
+
+  @ContentChild(Footer) footer;
 
   public columns: ColumnComponent[];
 
@@ -635,8 +666,8 @@ export class DataTable implements OnInit, AfterContentInit {
 
 @NgModule({
   imports: [CommonModule, MaterialModule, BrowserAnimationsModule, SharedModule, FormsModule],
-  exports: [DataTable, ColumnHeaderComponent, ColumnFooterComponent, TableBodyComponent, SharedModule],
+  exports: [DataTable, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent, TableBodyComponent, SharedModule],
   providers: [DomHandler, ObjectUtils],
-  declarations: [DataTable, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, RowExpansionLoader]
+  declarations: [DataTable, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, RowExpansionLoader]
 })
 export class TableModule { }

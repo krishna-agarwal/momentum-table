@@ -10,6 +10,20 @@
   font-size: 14px;
   color: rgba(0, 0, 0, 0.87);
 }
+.table-header{
+  height: 64px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-left: 24px;
+}
+.table-header-title{
+  line-height: 64px;
+  font-size: 22px;
+}
+.table-footer{
+  height: 56px;
+  border-top: 1px solid #e0e0e0;
+  padding-left: 24px;
+}
 table {
   width: 100%;
   border-collapse: collapse;
@@ -40,7 +54,7 @@ td{
 }
 
 tr {
-  border-top: 1px solid #e0e0e0;;
+  border-top: 1px solid #e0e0e0;
   height: 47px;
   transition: all 0.2s;
 }

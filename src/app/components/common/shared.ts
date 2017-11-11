@@ -6,6 +6,20 @@ import {
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 
+@Component({
+  selector: 'm-header',
+  template: ``
+})
+export class Header {
+  @Input() title: string;
+}
+
+@Component({
+  selector: 'm-footer',
+  template: ``
+})
+export class Footer {}
+
 @Directive({
   selector: '[mTemplate]'
 })
@@ -186,7 +200,7 @@ export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
 
 @NgModule({
   imports: [CommonModule],
-  exports: [ColumnComponent, MomentumTemplate, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader],
-  declarations: [ColumnComponent, MomentumTemplate, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
+  exports: [ColumnComponent, MomentumTemplate, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader],
+  declarations: [ColumnComponent, MomentumTemplate, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
 })
 export class SharedModule { }

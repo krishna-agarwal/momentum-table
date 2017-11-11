@@ -1,8 +1,13 @@
 <mat-card [ngClass]="{'ui-datatable ui-widget':true}" [ngStyle]="{'width': width, 'height': height}" class="table-container">
+
+  <div *ngIf="header" [mHeader]="header"></div>
+
   <table>
     <thead [mColumnHeader]="columns"></thead>
     <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>
     <tbody [mTableBody]="columns" [value]="value"></tbody>
   </table>
+
+  <div *ngIf="footer" [mFooter]="footer"></div>
 </mat-card>
 

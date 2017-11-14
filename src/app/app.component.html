@@ -3,10 +3,11 @@
          (onRowClick)="rowClick($event)"
          [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows"
          [expandable]="true" [expandMultiple]="false" (onRowExpand)="rowExpanded($event)" (onRowCollapse)="rowCollapse($event)"
-         (onEditComplete)="editComplete($event)" (onEditInit)="editInit($event)" (onEdit)="edit($event)" (onEditCancel)="editCancel($event)">
+         (onEditComplete)="editComplete($event)" (onEditInit)="editInit($event)" (onEdit)="edit($event)" (onEditCancel)="editCancel($event)"
+         (valueChange)="valueChange($event)" (onFilter)="onFilter($event)">
 
-  <m-header title="Countries"></m-header>
-  <m-footer></m-footer>
+  <m-header title="Countries" [globalSearch]="true"></m-header>
+  <!--<m-footer></m-footer>-->
 
   <m-column field="country" header="Country" [sortable]="true" [editable]="true"></m-column>
   <m-column field="capital" header="Capital" [sortable]="true"></m-column>

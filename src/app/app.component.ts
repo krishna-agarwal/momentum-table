@@ -85,4 +85,12 @@ export class AppComponent implements OnInit{
     console.log('edit cancel');
     console.log(event);
   }
+
+  valueChange(event){
+    console.log('valueChange', event);
+  }
+
+  onFilter(val){
+    console.log('filteredValue', val);
+  }
 }

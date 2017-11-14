@@ -1,11 +1,13 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import url('https://fonts.googleapis.com/css?family=Roboto');
-
+.card-wrapper{
+  padding: 0px !important;
+}
 .table-container{
+  width: 100%;
   overflow: scroll;
   background: #fff;
   display: inline-block !important;
-  padding: 0px !important;
   font-family: Roboto,Helvetica Neue,sans-serif !important;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.87);
@@ -14,10 +16,37 @@
   height: 64px;
   border-bottom: 1px solid #e0e0e0;
   padding-left: 24px;
+  padding-right: 14px;
+  position: relative;
+  display: flex;
 }
 .table-header-title{
+  width: 40%;
   line-height: 64px;
   font-size: 22px;
+}
+.search-box{
+  display: flex;
+  width: 60%;
+  right: 0px;
+}
+.search-box .mat-form-field-flex{
+  margin-top: 5px;
+}
+.ui-search-form{
+  -webkit-transition: width 0.2s ease-in-out;
+  transition: width 0.2s ease-in-out;
+}
+.search-icon{
+  position: absolute !important;
+  top: 12px !important;
+  right: 14px !important;
+}
+.search-open{
+  width: 100%;
+}
+.search-close{
+  width: 0%;
 }
 .table-footer{
   height: 56px;

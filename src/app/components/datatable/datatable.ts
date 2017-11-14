@@ -1,9 +1,11 @@
 import {
-  AfterContentInit, Component, ContentChild, ContentChildren, EmbeddedViewRef, EventEmitter, forwardRef, HostListener,
+  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, ElementRef, EmbeddedViewRef, EventEmitter,
+  forwardRef,
+  HostListener,
   Inject, Input,
   NgModule, OnDestroy, OnInit,
   Output,
-  QueryList, Renderer2, TemplateRef, ViewContainerRef
+  QueryList, Renderer2, TemplateRef, ViewChild, ViewContainerRef
 } from '@angular/core';
 import {ColumnComponent, Footer, Header, MomentumTemplate, SharedModule} from '../common/shared';
 import {CommonModule} from '@angular/common';
@@ -11,7 +13,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from '../common/material';
 import {DomHandler} from '../dom/domhandler';
 import {ObjectUtils} from '../util/objectutils';
-import {FormsModule} from "@angular/forms";
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'p-rowExpansionLoader',
@@ -45,20 +47,44 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
   selector: '[mHeader]',
   template: `
     <div class="table-header">
-      <span class="table-header-title">{{header.title}}</span>
+      <div *ngIf="header.title" class="table-header-title">{{header.title}}</div>
+      <div class="search-box">
+          <mat-form-field class="ui-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
+            <input matInput #globalFilterField placeholder="Search..." *ngIf="header.globalSearch" (input)="this.filterChange.emit(globalFilterField.value)">
+          </mat-form-field>
+          <button mat-icon-button *ngIf="!searchOpen" class="search-icon" (click)="toggleSearch(true)">
+            <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">search</mat-icon>
+          </button>
+          <button mat-icon-button *ngIf="searchOpen" class="search-icon" (click)="toggleSearch(false)">
+            <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">clear</mat-icon>
+          </button>
+      </div>
     </div>
   `
 })
 export class HeaderComponent {
   constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
   @Input('mHeader') header: Header;
+
+  @Output() filterChange: EventEmitter<string> = new EventEmitter();
+
+  @ViewChild('globalFilterField') globalFilterField: ElementRef;
+
+  searchOpen = false;
+  toggleSearch(state: boolean){
+    if(!state){
+      this.globalFilterField.nativeElement.value = '';
+      this.filterChange.emit('');
+    }
+    this.searchOpen = state;
+  }
 }
 
 @Component({
   selector: '[mFooter]',
   template: `
     <div class="table-footer">
-      Hello
+      
     </div>
   `
 })
@@ -130,8 +156,8 @@ export class ColumnFooterComponent {
           </span>
           <div class="ui-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable">
             <mat-card matInput class="ui-input-card" *ngIf="!col.editorTemplate">
-              <mat-form-field class="ui-input-form">
-                <input matInput [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)" 
+              <mat-form-field [floatPlaceholder]="'never'" class="ui-input-form">
+                <input matInput placeholder="{{col.header}}" [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)" 
                        (keydown)="dt.onCellEditorKeydown($event, col, row, rowIndex)" (blur)="dt.onCellEditorBlur($event, col, row, rowIndex)"
                        (input)="dt.onCellEditorInput($event, col, row, rowIndex)">
               </mat-form-field>
@@ -164,10 +190,9 @@ export class TableBodyComponent {
   selector: 'm-table',
   templateUrl: './table.component.html'
 })
-export class DataTable implements OnInit, AfterContentInit {
-  @Input() value;
+export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {
 
-  @Input() width: string = 'min-content';
+  @Input() width: string = '100%';
 
   @Input() height: string = 'auto';
 
@@ -207,6 +232,10 @@ export class DataTable implements OnInit, AfterContentInit {
 
   @Output() onEditCancel: EventEmitter<any> = new EventEmitter();
 
+  @Output() valueChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+
+  @Output() onFilter: EventEmitter<any> = new EventEmitter();
+
   @ContentChildren(ColumnComponent) cols: QueryList<ColumnComponent>;
 
   @ContentChildren(MomentumTemplate) templates: QueryList<MomentumTemplate>;
@@ -214,6 +243,12 @@ export class DataTable implements OnInit, AfterContentInit {
   @ContentChild(Header) header;
 
   @ContentChild(Footer) footer;
+
+  public _value: any[];
+
+  public filteredValue: any[];
+
+  public dataToRender: any[];
 
   public columns: ColumnComponent[];
 
@@ -237,6 +272,8 @@ export class DataTable implements OnInit, AfterContentInit {
 
   editChanged: boolean;
 
+  globalFilterString: string;
+
   constructor(public domHandler: DomHandler, public objectUtils: ObjectUtils, public renderer: Renderer2) { }
 
   ngOnInit() {
@@ -252,6 +289,26 @@ export class DataTable implements OnInit, AfterContentInit {
           break;
       }
     });
+  }
+
+  ngAfterViewInit() {
+
+  }
+
+  filterChange(val: string){
+    this.globalFilterString = val;
+    this._filter();
+  }
+
+  @Input() get value(): any[] {
+    return this._value;
+  }
+
+  set value(val:any[]) {
+    this._value = val ? [...val] : null;
+    this.handleDataChange();
+
+    this.valueChange.emit(this.value);
   }
 
   @Input() get sortField(): string{
@@ -282,6 +339,21 @@ export class DataTable implements OnInit, AfterContentInit {
   initColumns(): void{
     this.columns = this.cols.toArray();
   };
+
+  handleDataChange() {
+    if(this.sortField) {
+      if(!this.sortColumn && this.columns) {
+        this.sortColumn = this.columns.find(col => col.field === this.sortField);
+      }
+      this.sortSingle();
+    }
+
+    this.updateDataToRender(this.filteredValue || this.value);
+  }
+
+  updateDataToRender(dataSource) {
+    this.dataToRender = dataSource;
+  }
 
   resolveFieldData(data: any, field: string): any {
     if(data && field) {
@@ -660,6 +732,58 @@ export class DataTable implements OnInit, AfterContentInit {
 
       // this.closeCell();
     }
+  }
+
+  _filter() {
+    if(!this.value || !this.columns) {
+      return;
+    }
+
+    this.filteredValue = [];
+
+    for(let i = 0; i < this.value.length; i++) {
+      let globalMatch = false;
+
+      for(let j = 0; j < this.columns.length; j++) {
+        let col = this.columns[j];
+
+        if(this.header.globalSearch && !globalMatch) {
+          globalMatch = this.filterContains(this.resolveFieldData(this.value[i], col.field), this.globalFilterString);
+        }
+      }
+
+      if(globalMatch) {
+        this.filteredValue.push(this.value[i]);
+      }
+    }
+
+    if(this.filteredValue.length === this.value.length) {
+      this.filteredValue = null;
+    }
+
+    this.updateDataToRender(this.filteredValue || this.value);
+
+
+    this.onFilter.emit({
+        filterQuery: this.globalFilterString,
+        filteredValue: this.filteredValue || this.value
+    });
+  }
+
+  filterContains(value, filter): boolean {
+    if(filter === undefined || filter === null || (typeof filter === 'string' && filter.trim() === '')) {
+      return true;
+    }
+
+    if(value === undefined || value === null) {
+      return false;
+    }
+
+    return value.toString().toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+  }
+
+  ngOnDestroy(){
+
   }
 
 }

@@ -1,8 +1,9 @@
 import {
-  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, ElementRef, EmbeddedViewRef, EventEmitter,
+  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef, EmbeddedViewRef,
+  EventEmitter,
   forwardRef,
-  Inject, Input,
-  NgModule, OnDestroy, OnInit,
+  Inject, Input, IterableDiffers,
+  NgModule, OnChanges, OnDestroy, OnInit,
   Output,
   QueryList, Renderer2, TemplateRef, ViewChild, ViewContainerRef
 } from '@angular/core';
@@ -190,7 +191,7 @@ export class TableBodyComponent {
   selector: 'm-table',
   templateUrl: './table.component.html'
 })
-export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {
+export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, DoCheck {
 
   @Input() width: string = '100%';
 
@@ -274,7 +275,11 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   globalFilterString: string;
 
-  constructor(public domHandler: DomHandler, public objectUtils: ObjectUtils, public renderer: Renderer2) { }
+  differ: any;
+
+  constructor(public domHandler: DomHandler, public objectUtils: ObjectUtils, public renderer: Renderer2, public differs: IterableDiffers) {
+    this.differ = differs.find([]).create(null);
+  }
 
   ngOnInit() {
   }
@@ -305,8 +310,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
 
   set value(val:any[]) {
-    this._value = val ? [...val] : null;
-    this.handleDataChange();
+    this._value = val;
 
     this.valueChange.emit(this.value);
   }
@@ -339,6 +343,13 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   initColumns(): void{
     this.columns = this.cols.toArray();
   };
+
+  ngDoCheck() {
+    let changes = this.differ.diff(this.value);
+    if(changes) {
+      this.handleDataChange();
+    }
+  }
 
   handleDataChange() {
     if(this.hasFilter()) {

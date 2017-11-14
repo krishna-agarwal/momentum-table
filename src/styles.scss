@@ -25,8 +25,13 @@
   line-height: 64px;
   font-size: 22px;
 }
+.table-header-selection-count{
+  width: 40%;
+  line-height: 64px;
+}
 .search-box{
   display: flex;
+  justify-content: flex-end;
   width: 60%;
   right: 0px;
 }

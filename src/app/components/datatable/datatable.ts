@@ -1,7 +1,6 @@
 import {
   AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, ElementRef, EmbeddedViewRef, EventEmitter,
   forwardRef,
-  HostListener,
   Inject, Input,
   NgModule, OnDestroy, OnInit,
   Output,
@@ -47,7 +46,8 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
   selector: '[mHeader]',
   template: `
     <div class="table-header">
-      <div *ngIf="header.title" class="table-header-title">{{header.title}}</div>
+      <div *ngIf="header.title && !dt.itemsSelected()" class="table-header-title">{{header.title}}</div>
+      <div *ngIf="dt.itemsSelected()" class="table-header-selection-count">{{dt.itemsSelected()}} items(s) selected</div>
       <div class="search-box">
           <mat-form-field class="ui-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
             <input matInput #globalFilterField placeholder="Search..." *ngIf="header.globalSearch" (input)="this.filterChange.emit(globalFilterField.value)">
@@ -565,6 +565,16 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       }
     }
     return false;
+  }
+
+  itemsSelected(){
+    if(this.selection instanceof Array)
+      return this.selection.length;
+    else if(this.selection instanceof Object){
+      return 1;
+    }else{
+      return 0;
+    }
   }
 
   get allSelected() {

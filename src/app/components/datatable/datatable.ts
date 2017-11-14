@@ -341,6 +341,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   };
 
   handleDataChange() {
+    if(this.hasFilter()) {
+      this._filter();
+    }
+
     if(this.sortField) {
       if(!this.sortColumn && this.columns) {
         this.sortColumn = this.columns.find(col => col.field === this.sortField);
@@ -439,6 +443,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
         return (this.sortOrder * result);
       });
+
+      if(this.hasFilter()) {
+        this._filter();
+      }
     }
   }
 
@@ -780,6 +788,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     }
 
     return value.toString().toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+  }
+
+  hasFilter() {
+    return (this.globalFilterString && this.globalFilterString.trim().length);
   }
 
   ngOnDestroy(){

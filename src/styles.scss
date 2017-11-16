@@ -47,6 +47,8 @@
   top: 12px;
 }
 .ui-search-form{
+  position: absolute !important;
+  right: 0;
   -webkit-transition: width 0.2s ease-in-out;
   transition: width 0.2s ease-in-out;
 }
@@ -81,10 +83,6 @@ table {
   border-spacing: 0;
   position: relative;
 }
-//th,td{
-//  min-width: 100px;
-//  max-width: 200px;
-//}
 th:not(:first-child),td:not(:first-child){
   padding: 0px 28px;
 }
@@ -98,7 +96,7 @@ th{
   top: 0;
   position: sticky;
   background: #fff;
-  z-index: 2000;
+  z-index: 2000 !important;
 }
 td{
   position: relative;

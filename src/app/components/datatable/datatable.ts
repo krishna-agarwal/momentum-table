@@ -92,6 +92,8 @@ export class HeaderComponent {
     if(!state){
       this.globalFilterField.nativeElement.value = '';
       this.filterChange.emit('');
+    }else {
+      this.globalFilterField.nativeElement.focus();
     }
     this.searchOpen = state;
   }

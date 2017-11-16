@@ -6,13 +6,13 @@
          (onEditComplete)="editComplete($event)" (onEditInit)="editInit($event)" (onEdit)="edit($event)" (onEditCancel)="editCancel($event)"
          (valueChange)="valueChange($event)" (onFilter)="onFilter($event)">
 
-  <m-header title="Countries" [globalSearch]="true"></m-header>
+  <m-header title="Countries" [globalSearch]="true" [colSetting]="true"></m-header>
   <!--<m-footer></m-footer>-->
 
   <m-column field="country" header="Country" [sortable]="true" [editable]="true"></m-column>
-  <m-column field="capital" header="Capital" [sortable]="true"></m-column>
+  <m-column field="capital" header="Capital" [sortable]="true" [hidden]="true"></m-column>
   <m-column field="continent" header="Continent"></m-column>
-  <m-column field="flag" [sortable]="true" [editable]="true">
+  <m-column field="flag" header="flag" [sortable]="true" [editable]="true">
     <ng-template let-col mTemplate="header">
       <button type="button" (click)="flagHeaderClick(col)">Falg</button>
     </ng-template>

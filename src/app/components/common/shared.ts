@@ -13,6 +13,7 @@ import {CommonModule} from '@angular/common';
 export class Header {
   @Input() title: string;
   @Input() globalSearch: boolean = false;
+  @Input() colSetting: boolean = true;
 }
 
 @Component({

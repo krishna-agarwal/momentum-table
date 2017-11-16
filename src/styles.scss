@@ -29,23 +29,40 @@
   width: 40%;
   line-height: 64px;
 }
-.search-box{
+.tool-box{
   display: flex;
   justify-content: flex-end;
   width: 60%;
   right: 0px;
+  color: #757575;
 }
-.search-box .mat-form-field-flex{
+.tool-box .mat-form-field-flex{
   margin-top: 5px;
+}
+.search-setting-wrapper{
+  width: 100%;
+  position: relative;
+}
+.col-setting-btn{
+  top: 12px;
 }
 .ui-search-form{
   -webkit-transition: width 0.2s ease-in-out;
   transition: width 0.2s ease-in-out;
 }
+.col-setting-wrapper{
+  position: absolute !important;
+  top: 65px;
+  right: 0px;
+  padding: 0px !important;
+  z-index: 3000;
+  max-height: 200px;
+  overflow: auto;
+}
 .search-icon{
   position: absolute !important;
   top: 12px !important;
-  right: 14px !important;
+  right: 0px !important;
 }
 .search-open{
   width: 100%;

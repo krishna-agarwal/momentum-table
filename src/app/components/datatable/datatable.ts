@@ -3,7 +3,7 @@ import {
   EventEmitter,
   forwardRef,
   Inject, Input, IterableDiffers,
-  NgModule, OnChanges, OnDestroy, OnInit,
+  NgModule, OnDestroy, OnInit,
   Output,
   QueryList, Renderer2, TemplateRef, ViewChild, ViewContainerRef
 } from '@angular/core';
@@ -48,8 +48,9 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
   template: `
     <div class="table-header">
       <div *ngIf="header.title && !dt.itemsSelected()" class="table-header-title">{{header.title}}</div>
-      <div *ngIf="dt.itemsSelected()" class="table-header-selection-count">{{dt.itemsSelected()}} items(s) selected</div>
-      <div class="search-box">
+      <div *ngIf="dt.itemsSelected()" class="table-header-selection-count">{{dt.itemsSelected()}} item(s) selected</div>
+      <div class="tool-box">
+        <div class="search-setting-wrapper">
           <mat-form-field class="ui-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
             <input matInput #globalFilterField placeholder="Search..." *ngIf="header.globalSearch" (input)="this.filterChange.emit(globalFilterField.value)">
           </mat-form-field>
@@ -59,12 +60,25 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
           <button mat-icon-button *ngIf="searchOpen" class="search-icon" (click)="toggleSearch(false)">
             <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">clear</mat-icon>
           </button>
+        </div>
+          
+        <button mat-icon-button *ngIf="header.colSetting" class="col-setting-btn" (click)="toggleColSetting()">
+          <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">view_column</mat-icon>
+        </button>
+        <mat-card class="col-setting-wrapper" *ngIf="colSettingOpen">
+          <mat-selection-list>
+            <mat-list-option [selected]="!col.hidden" [value]="col.header" (click)="toggleColumn(col)" checkboxPosition="'before'" *ngFor="let col of dt.columns">
+              {{col.header}}
+            </mat-list-option>
+          </mat-selection-list>
+        </mat-card>
       </div>
+      
     </div>
   `
 })
 export class HeaderComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
+  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable, public renderer: Renderer2) { };
   @Input('mHeader') header: Header;
 
   @Output() filterChange: EventEmitter<string> = new EventEmitter();
@@ -72,6 +86,8 @@ export class HeaderComponent {
   @ViewChild('globalFilterField') globalFilterField: ElementRef;
 
   searchOpen = false;
+  colSettingOpen = false;
+
   toggleSearch(state: boolean){
     if(!state){
       this.globalFilterField.nativeElement.value = '';
@@ -79,6 +95,15 @@ export class HeaderComponent {
     }
     this.searchOpen = state;
   }
+
+  toggleColSetting() {
+    this.colSettingOpen = !this.colSettingOpen;
+  }
+
+  toggleColumn(col) {
+    col.hidden = !col.hidden;
+  }
+
 }
 
 @Component({
@@ -101,7 +126,7 @@ export class FooterComponent {
       <th *ngIf="dt.selectionHandler == true" class="ui-checkbox-header">
         <mat-checkbox [disabled]="dt.selectionMode == 'single'" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
       </th>
-      <th *ngFor="let col of columns" (click)="dt.sort($event,col)" 
+      <th [hidden]="col.hidden" *ngFor="let col of columns" (click)="dt.sort($event,col)" 
           [ngClass]="{'ui-sortable-column': col.sortable}">
         <span *ngIf="!col.headerTemplate">{{ col.header }}</span>
         <span *ngIf="col.headerTemplate">
@@ -126,7 +151,7 @@ export class ColumnHeaderComponent {
     <tr>
       <td *ngIf="dt.selectionHandler == true">
       </td>
-      <td *ngFor="let col of columns">
+      <td [hidden]="col.hidden" *ngFor="let col of columns">
         <span *ngIf="!col.footerTemplate">{{ col.footer }}</span>
         <span *ngIf="col.footerTemplate">
           <m-columnFooterTemplateLoader [column]="col"></m-columnFooterTemplateLoader>
@@ -150,7 +175,7 @@ export class ColumnFooterComponent {
         <td *ngIf="dt.selectionHandler == true">
           <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
         </td>
-        <td #cell *ngFor="let col of columns" [ngClass]="{'ui-editable-column':col.editable, 'ui-clickable':col.editable}" (click)="dt.switchCellToEditMode(cell,col,row)">
+        <td #cell [hidden]="col.hidden" *ngFor="let col of columns" [ngClass]="{'ui-editable-column':col.editable, 'ui-clickable':col.editable}" (click)="dt.switchCellToEditMode(cell,col,row)">
           <span class="ui-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'ui-clickable':col.editable}">{{row[col.field]}}</span>
           <span class="ui-cell-data" *ngIf="col.bodyTemplate">
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>

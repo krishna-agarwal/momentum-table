@@ -46,13 +46,17 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
 @Component({
   selector: '[mHeader]',
   template: `
-    <div class="table-header">
+    <div *ngIf="header.template" class="table-header">
+      <m-globalHeaderTemplateLoader [header]="header"></m-globalHeaderTemplateLoader>
+    </div>
+    
+    <div *ngIf="!header.template" class="table-header">
       <div *ngIf="header.title && !dt.itemsSelected()" class="table-header-title">{{header.title}}</div>
       <div *ngIf="dt.itemsSelected()" class="table-header-selection-count">{{dt.itemsSelected()}} item(s) selected</div>
       <div class="tool-box">
         <div class="search-setting-wrapper">
           <mat-form-field class="ui-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
-            <input matInput #globalFilterField placeholder="Search..." *ngIf="header.globalSearch" (input)="this.filterChange.emit(globalFilterField.value)">
+            <input matInput #globalFilterField placeholder="Search..." *ngIf="header.globalSearch">
           </mat-form-field>
           <button mat-icon-button *ngIf="!searchOpen" class="search-icon" (click)="toggleSearch(true)">
             <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">search</mat-icon>
@@ -77,8 +81,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
     </div>
   `
 })
-export class HeaderComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable, public renderer: Renderer2) { };
+export class HeaderComponent implements AfterViewInit, OnDestroy{
   @Input('mHeader') header: Header;
 
   @Output() filterChange: EventEmitter<string> = new EventEmitter();
@@ -87,6 +90,18 @@ export class HeaderComponent {
 
   searchOpen = false;
   colSettingOpen = false;
+
+  globalFilterFunction: any;
+
+  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable, public renderer: Renderer2) { };
+
+  ngAfterViewInit(){
+    if(this.globalFilterField){
+      this.globalFilterFunction = this.renderer.listen(this.globalFilterField.nativeElement, 'keyup', () => {
+        this.filterChange.emit(this.globalFilterField.nativeElement.value);
+      });
+    }
+  }
 
   toggleSearch(state: boolean){
     if(!state){
@@ -106,13 +121,22 @@ export class HeaderComponent {
     col.hidden = !col.hidden;
   }
 
+  ngOnDestroy(){
+    if(this.globalFilterFunction) {
+      this.globalFilterFunction();
+    }
+  }
+
 }
 
 @Component({
   selector: '[mFooter]',
   template: `
-    <div class="table-footer">
-      
+    <div *ngIf="footer.template" class="table-footer">
+      <m-globalFooterTemplateLoader [footer]="footer"></m-globalFooterTemplateLoader>
+    </div>
+    <div *ngIf="!footer.template" class="table-footer">
+      Welcome
     </div>
   `
 })
@@ -216,7 +240,20 @@ export class TableBodyComponent {
 
 @Component({
   selector: 'm-table',
-  templateUrl: './table.component.html'
+  template: `
+    <mat-card [ngClass]="{'ui-datatable ui-widget':true}" [ngStyle]="{'width': width, 'height': height}" class="card-wrapper">
+      <div *ngIf="header" [mHeader]="header" (filterChange)="filterChange($event)"></div>
+      <div class="table-container">
+        <table>
+          <thead [mColumnHeader]="columns"></thead>
+          <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>
+          <tbody [mTableBody]="columns" [value]="dataToRender"></tbody>
+        </table>
+      </div>
+      <div *ngIf="footer" [mFooter]="footer"></div>
+    </mat-card>
+  `,
+  providers: [DomHandler, ObjectUtils]
 })
 export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, DoCheck {
 
@@ -850,8 +887,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
 @NgModule({
   imports: [CommonModule, MaterialModule, BrowserAnimationsModule, SharedModule, FormsModule],
-  exports: [DataTable, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent, TableBodyComponent, SharedModule],
-  providers: [DomHandler, ObjectUtils],
+  exports: [DataTable, SharedModule],
   declarations: [DataTable, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, RowExpansionLoader]
 })
 export class TableModule { }

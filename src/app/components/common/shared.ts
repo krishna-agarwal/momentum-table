@@ -1,26 +1,13 @@
 import {
-  AfterContentInit, Component, ContentChildren, Directive, EmbeddedViewRef, Input, NgModule, OnChanges, OnDestroy,
+  AfterContentInit, Component, ContentChild, ContentChildren, Directive, ElementRef, EmbeddedViewRef,
+  Input, NgModule,
+  OnChanges,
+  OnDestroy,
   OnInit,
   QueryList, SimpleChanges,
   TemplateRef, ViewContainerRef
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
-
-@Component({
-  selector: 'm-header',
-  template: ``
-})
-export class Header {
-  @Input() title: string;
-  @Input() globalSearch: boolean = false;
-  @Input() colSetting: boolean = true;
-}
-
-@Component({
-  selector: 'm-footer',
-  template: ``
-})
-export class Footer {}
 
 @Directive({
   selector: '[mTemplate]'
@@ -32,6 +19,87 @@ export class MomentumTemplate{
 
   getType(): string {
     return this.type;
+  }
+}
+
+@Component({
+  selector: 'm-header',
+  template: ``
+})
+export class Header {
+  @Input() title: string;
+  @Input() globalSearch: boolean = false;
+  @Input() colSetting: boolean = true;
+
+  @ContentChild(TemplateRef) template: TemplateRef<any>;
+  constructor(){ }
+}
+
+@Component({
+  selector: 'm-globalHeaderTemplateLoader',
+  template: ``
+})
+export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy {
+
+  @Input() header: any;
+
+  view: EmbeddedViewRef<any>;
+
+  constructor(public viewContainer: ViewContainerRef) {}
+
+  ngOnInit() {
+    this.view = this.viewContainer.createEmbeddedView(this.header.template, {
+      '\$implicit': this.header
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if(!this.view) {
+      return;
+    }
+  }
+
+  ngOnDestroy() {
+    this.view.destroy();
+  }
+}
+
+@Component({
+  selector: 'm-footer',
+  template: ``
+})
+export class Footer {
+  @ContentChild(TemplateRef) template: TemplateRef<any>;
+
+  constructor() { }
+}
+
+@Component({
+  selector: 'm-globalFooterTemplateLoader',
+  template: ``
+})
+export class GlobalFooterTemplateLoader implements OnInit, OnChanges, OnDestroy {
+
+  @Input() footer: any;
+
+  view: EmbeddedViewRef<any>;
+
+  constructor(public viewContainer: ViewContainerRef) {}
+
+  ngOnInit() {
+    this.view = this.viewContainer.createEmbeddedView(this.footer.template, {
+      '\$implicit': this.footer
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if(!this.view) {
+      return;
+    }
+  }
+
+  ngOnDestroy() {
+    this.view.destroy();
   }
 }
 
@@ -202,7 +270,7 @@ export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
 
 @NgModule({
   imports: [CommonModule],
-  exports: [ColumnComponent, MomentumTemplate, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader],
-  declarations: [ColumnComponent, MomentumTemplate, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
+  exports: [ColumnComponent, MomentumTemplate, GlobalHeaderTemplateLoader, GlobalFooterTemplateLoader, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader],
+  declarations: [ColumnComponent, MomentumTemplate, GlobalHeaderTemplateLoader, GlobalFooterTemplateLoader, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
 })
 export class SharedModule { }

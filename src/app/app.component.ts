@@ -14,27 +14,22 @@ export class AppComponent implements OnInit{
 
   ngOnInit(){
 
-    setTimeout(() => {
-      this.countries = [
-        {'country': 'Afghanistan', 'capital': 'Kabul', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Afghanistan.jpg'},
-        {'country': 'India', 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'},
-        {'country': 'Iraq', 'capital': 'Baghdad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Iraq.jpg'},
-        {'country': 'Bhutan', 'capital': 'Thimphu', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Bhutan.jpg'},
-        {'country': 'Pakistan', 'capital': 'Islamabad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Pakistan.jpg'},
-        {'country': 'France', 'capital': 'Paris', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/France.jpg'},
-        {'country': 'Germany', 'capital': 'Berlin', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Germany.jpg'},
-        {'country': 'Ireland', 'capital': 'Dublin', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Ireland.jpg'},
-        {'country': 'Austria', 'capital': 'Vienna', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Austria.jpg'},
-        {'country': 'Bulgaria', 'capital': 'Sofia', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Bulgaria.jpg'},
-        {'country': 'Cuba', 'capital': 'Havana', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Cuba.jpg'},
-        {'country': 'Canada', 'capital': 'Ottawa', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Canada.jpg'},
-        {'country': 'Jamaica', 'capital': 'Kingston', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Jamaica.jpg'}
-      ];
-    }, 2000);
 
-    setTimeout(() => {
-      this.selectedRows = [{'country': 'India', 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'}];
-    }, 7000);
+    this.countries = [
+      {'country': 'Afghanistan', 'population': 35530081, 'capital': 'Kabul', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Afghanistan.jpg'},
+      {'country': 'India', 'population': 1339180127, 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'},
+      {'country': 'Iraq', 'population': 38274618, 'capital': 'Baghdad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Iraq.jpg'},
+      {'country': 'Bhutan', 'population': 807610, 'capital': 'Thimphu', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Bhutan.jpg'},
+      {'country': 'Pakistan', 'population': 197015955, 'capital': 'Islamabad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Pakistan.jpg'},
+      {'country': 'France', 'population': 64979548, 'capital': 'Paris', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/France.jpg'},
+      {'country': 'Germany', 'population': 82114224, 'capital': 'Berlin', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Germany.jpg'},
+      {'country': 'Ireland', 'population': 4761657, 'capital': 'Dublin', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Ireland.jpg'},
+      {'country': 'Austria', 'population': 8735453, 'capital': 'Vienna', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Austria.jpg'},
+      {'country': 'Bulgaria', 'population': 7084571, 'capital': 'Sofia', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Bulgaria.jpg'},
+      {'country': 'Cuba', 'population': 11484636, 'capital': 'Havana', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Cuba.jpg'},
+      {'country': 'Canada', 'population': 36624199, 'capital': 'Ottawa', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Canada.jpg'},
+      {'country': 'Jamaica', 'population': 2890299, 'capital': 'Kingston', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Jamaica.jpg'}
+    ];
 
   }
 

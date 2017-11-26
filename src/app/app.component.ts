@@ -94,6 +94,10 @@ export class AppComponent implements OnInit{
   }
 
   onFilter(val){
-    console.log('filteredValue', val);
+    console.log('filter change', val);
+  }
+
+  tableReload(){
+    console.log('reload logic');
   }
 }

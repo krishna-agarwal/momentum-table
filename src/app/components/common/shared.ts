@@ -30,6 +30,11 @@ export class Header {
   @Input() title: string;
   @Input() globalSearch: boolean = false;
   @Input() colSetting: boolean = true;
+  @Input() export: boolean = false;
+  @Input() csvSeparator: string = ',';
+  @Input() exportFilename: string = 'download';
+  @Input() exportSelectionOnly: boolean = false;
+  @Input() reload: boolean = false;
 
   @ContentChild(TemplateRef) template: TemplateRef<any>;
   constructor(){ }

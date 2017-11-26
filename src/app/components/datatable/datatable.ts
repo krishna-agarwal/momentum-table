@@ -67,7 +67,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
         </div>
           
         <button mat-icon-button *ngIf="header.colSetting" class="col-setting-btn" (click)="toggleColSetting()">
-          <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">view_column</mat-icon>
+          <mat-icon class="mat-24" aria-label="column">view_column</mat-icon>
         </button>
         <mat-card class="col-setting-wrapper" *ngIf="colSettingOpen">
           <mat-selection-list>
@@ -76,6 +76,14 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
             </mat-list-option>
           </mat-selection-list>
         </mat-card>
+
+        <button mat-icon-button *ngIf="header.export" class="col-setting-btn" [disabled]="header.exportSelectionOnly && !dt.itemsSelected()" (click)="dt.exportCSV(header.csvSeparator, header.exportFilename, header.exportSelectionOnly)">
+          <mat-icon class="mat-24" aria-label="download">file_download</mat-icon>
+        </button>
+        
+        <button mat-icon-button *ngIf="header.reload" class="col-setting-btn" (click)="dt.reload()">
+          <mat-icon class="mat-24" aria-label="refresh">refresh</mat-icon>
+        </button>
       </div>
       
     </div>
@@ -135,6 +143,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
     <div *ngIf="footer.template" class="table-footer">
       <m-globalFooterTemplateLoader [footer]="footer"></m-globalFooterTemplateLoader>
     </div>
+    
     <div *ngIf="!footer.template" class="table-footer">
       Welcome
     </div>
@@ -300,6 +309,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   @Output() valueChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
   @Output() onFilter: EventEmitter<any> = new EventEmitter();
+
+  @Output() onReload: EventEmitter<string> = new EventEmitter();
 
   @ContentChildren(ColumnComponent) cols: QueryList<ColumnComponent>;
 
@@ -877,6 +888,67 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   hasFilter() {
     return (this.globalFilterString && this.globalFilterString.trim().length);
+  }
+
+  public reload(){
+    this.onReload.emit();
+  }
+
+  public exportCSV(csvSeparator: string, exportFilename: string, selectionOnly: boolean) {
+    let data = this.filteredValue||this.value;
+    let csv = '\ufeff';
+
+    if(selectionOnly) {
+      data = this.selection || [];
+    }
+
+    //headers
+    for(let i = 0; i < this.columns.length; i++) {
+      if(this.columns[i].field) {
+        csv += '"' + (this.columns[i].header || this.columns[i].field) + '"';
+
+        if(i < (this.columns.length - 1)) {
+          csv += csvSeparator;
+        }
+      }
+    }
+
+    //body
+    data.forEach((record, i) => {
+      csv += '\n';
+      for(let i = 0; i < this.columns.length; i++) {
+        if(this.columns[i].field) {
+          csv += '"' + this.resolveFieldData(record, this.columns[i].field) + '"';
+
+          if(i < (this.columns.length - 1)) {
+            csv += csvSeparator;
+          }
+        }
+      }
+    });
+
+    let blob = new Blob([csv],{
+      type: 'text/csv;charset=utf-8;'
+    });
+
+    if(window.navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(blob, exportFilename + '.csv');
+    }
+    else {
+      let link = document.createElement('a');
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      if(link.download !== undefined) {
+        link.setAttribute('href', URL.createObjectURL(blob));
+        link.setAttribute('download', exportFilename + '.csv');
+        link.click();
+      }
+      else {
+        csv = 'data:text/csv;charset=utf-8,' + csv;
+        window.open(encodeURI(csv));
+      }
+      document.body.removeChild(link);
+    }
   }
 
   ngOnDestroy(){

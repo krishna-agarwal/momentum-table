@@ -1,5 +1,7 @@
 import {
-  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef, EmbeddedViewRef,
+  AfterContentChecked,
+  AfterContentInit, AfterViewChecked, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef,
+  EmbeddedViewRef,
   EventEmitter,
   forwardRef,
   Inject, Input, IterableDiffers,
@@ -77,7 +79,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
           </mat-selection-list>
         </mat-card>
 
-        <button mat-icon-button *ngIf="header.export" class="col-setting-btn" [disabled]="header.exportSelectionOnly && !dt.itemsSelected()" (click)="dt.exportCSV(header.csvSeparator, header.exportFilename, header.exportSelectionOnly)">
+        <button mat-icon-button *ngIf="header.export" class="col-setting-btn"  (click)="dt.exportCSV(header.csvSeparator, header.exportFilename, header.exportSelectionOnly)">
           <mat-icon class="mat-24" aria-label="download">file_download</mat-icon>
         </button>
         
@@ -145,13 +147,15 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
     </div>
     
     <div *ngIf="!footer.template" class="table-footer">
-      Welcome
+      <div *ngIf="footer.paginator">
+        <mat-paginator (page)="dt.pageChange($event)" [length]="dt.totalRecords" [pageIndex]="dt.pageIndex" [pageSize]="footer.pageSize" [pageSizeOptions]="footer.pageSizeOptions"></mat-paginator>
+      </div>
     </div>
   `
 })
 export class FooterComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
   @Input('mFooter') footer: Footer;
+  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
 }
 
 @Component({
@@ -264,7 +268,7 @@ export class TableBodyComponent {
   `,
   providers: [DomHandler, ObjectUtils]
 })
-export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, DoCheck {
+export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, DoCheck, AfterContentChecked {
 
   @Input() width: string = '100%';
 
@@ -276,7 +280,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   @Input() selectable: boolean;
 
-  @Input() selectionMode: string = 'single';
+  @Input() selectionMode: string = 'multiple';
 
   @Input() selectionHandler: boolean = true;
 
@@ -312,6 +316,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   @Output() onReload: EventEmitter<string> = new EventEmitter();
 
+  @Output() onPage: EventEmitter<any> = new EventEmitter();
+
   @ContentChildren(ColumnComponent) cols: QueryList<ColumnComponent>;
 
   @ContentChildren(MomentumTemplate) templates: QueryList<MomentumTemplate>;
@@ -321,6 +327,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   @ContentChild(Footer) footer;
 
   public _value: any[];
+
+  public totalRecords: number = 0;
+
+  public pageIndex: number = 0;
 
   public filteredValue: any[];
 
@@ -350,6 +360,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   globalFilterString: string;
 
+  filterTimeout: any;
+
   differ: any;
 
   constructor(public domHandler: DomHandler, public objectUtils: ObjectUtils, public renderer: Renderer2, public differs: IterableDiffers) {
@@ -377,7 +389,13 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   filterChange(val: string){
     this.globalFilterString = val;
-    this._filter();
+    if (this.filterTimeout) {
+      clearTimeout(this.filterTimeout);
+    }
+    this.filterTimeout = setTimeout(() => {
+      this._filter();
+      this.filterTimeout = null;
+    }, 300);
   }
 
   @Input() get value(): any[] {
@@ -420,6 +438,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   };
 
   ngDoCheck() {
+
+  }
+
+  ngAfterContentChecked() {
     let changes = this.differ.diff(this.value);
     if(changes) {
       this.handleDataChange();
@@ -441,8 +463,30 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     this.updateDataToRender(this.filteredValue || this.value);
   }
 
-  updateDataToRender(dataSource) {
-    this.dataToRender = dataSource;
+  pageChange(pageData){
+    this.footer.pageSize = pageData.pageSize;
+    this.updateDataToRender(this.filteredValue || this.value, pageData.pageIndex, pageData.pageSize);
+    this.onPage.emit(pageData);
+  }
+
+  updateDataToRender(dataSource, pageIndex: number = 0, pageSize: number = this.footer ? this.footer.pageSize : 0) {
+    this.totalRecords = dataSource.length;
+    this.pageIndex = pageIndex;
+
+    if(this.footer && this.footer.paginator){
+      this.dataToRender = [];
+      const startIndex: number = pageIndex * pageSize;
+      const endIndex: number = startIndex + pageSize;
+
+      for(let i = startIndex; i < endIndex; i++) {
+        if(i >= dataSource.length) {
+          break;
+        }
+        this.dataToRender.push(dataSource[i]);
+      }
+    }else{
+      this.dataToRender = dataSource;
+    }
   }
 
   resolveFieldData(data: any, field: string): any {
@@ -530,9 +574,9 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
         return (this.sortOrder * result);
       });
 
-      if(this.hasFilter()) {
-        this._filter();
-      }
+      // if(this.hasFilter()) {
+      //   this._filter();
+      // }
     }
   }
 
@@ -867,7 +911,6 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
     this.updateDataToRender(this.filteredValue || this.value);
 
-
     this.onFilter.emit({
         filterQuery: this.globalFilterString,
         filteredValue: this.filteredValue || this.value
@@ -899,7 +942,23 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     let csv = '\ufeff';
 
     if(selectionOnly) {
-      data = this.selection || [];
+      data = [];
+      if(this.filteredValue){
+        if(this.selection && this.selection instanceof Array)
+          this.selection.forEach((selectedRow) => {
+            if(this.filteredValue.indexOf(selectedRow) !== -1)
+              data.push(selectedRow);
+          });
+        else if(this.selection && this.selection instanceof Object)
+          if(this.filteredValue.indexOf(this.selection) !== -1)
+            data.push(this.selection);
+
+      }else{
+        if(this.selection && this.selection instanceof Array)
+          data = this.selection;
+        else if(this.selection && this.selection instanceof Object)
+          data = [this.selection];
+      }
     }
 
     //headers

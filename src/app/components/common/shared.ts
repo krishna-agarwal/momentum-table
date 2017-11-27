@@ -74,6 +74,9 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
   template: ``
 })
 export class Footer {
+  @Input() paginator: boolean = false;
+  @Input() pageSize: number = 10;
+  @Input() pageSizeOptions: number[] = [5, 10, 25];
   @ContentChild(TemplateRef) template: TemplateRef<any>;
 
   constructor() { }

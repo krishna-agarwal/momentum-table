@@ -1,6 +1,6 @@
 import {
   AfterContentChecked,
-  AfterContentInit, AfterViewChecked, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef,
+  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, DoCheck, ElementRef,
   EmbeddedViewRef,
   EventEmitter,
   forwardRef,
@@ -606,10 +606,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       const selected = this.isSelected(rowData);
       if(this.selectionMode === 'single'){
         if(selected) {
-          this._selection = null;
+          this._selection = [];
           this.onRowUnselect.emit({originalEvent: event, data: rowData, type: 'row'});
         }else{
-          this._selection = rowData;
+          this._selection = [rowData];
           this.onRowSelect.emit({originalEvent: event, data: rowData, type: 'row'});
         }
       }else if(this.selectionMode === 'multiple'){
@@ -645,11 +645,11 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   toggleRowWithCheckbox(event, rowData: any) {
     if(this.selectionMode === 'single'){
-      if(!this.objectUtils.equalsByValue(this.selection, rowData)){
-        this._selection = rowData;
+      if(!this.objectUtils.equalsByValue(this.selection, [rowData])){
+        this._selection = [rowData];
         this.onRowSelect.emit({originalEvent: event, data: rowData, type: 'checkbox'});
       }else {
-        this._selection = null;
+        this._selection = [];
         this.onRowUnselect.emit({originalEvent: event, data: rowData, type: 'checkbox'});
       }
     }else if(this.selectionMode === 'multiple'){
@@ -666,7 +666,6 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     }
 
     this.selectionChange.emit(this.selection);
-    // this.preventRowClickPropagation = true;
   }
 
   findIndexInSelection(rowData: any) {
@@ -690,9 +689,6 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     if(rowData && this.selection) {
       if(this.selection instanceof Array)
         return this.findIndexInSelection(rowData) > -1;
-      else{
-        return this.objectUtils.equalsByValue(rowData, this.selection);
-      }
     }
     return false;
   }
@@ -700,9 +696,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   itemsSelected(){
     if(this.selection instanceof Array)
       return this.selection.length;
-    else if(this.selection instanceof Object){
-      return 1;
-    }else{
+    else{
       return 0;
     }
   }
@@ -949,15 +943,9 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
             if(this.filteredValue.indexOf(selectedRow) !== -1)
               data.push(selectedRow);
           });
-        else if(this.selection && this.selection instanceof Object)
-          if(this.filteredValue.indexOf(this.selection) !== -1)
-            data.push(this.selection);
-
       }else{
         if(this.selection && this.selection instanceof Array)
           data = this.selection;
-        else if(this.selection && this.selection instanceof Object)
-          data = [this.selection];
       }
     }
 

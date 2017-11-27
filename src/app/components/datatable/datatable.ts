@@ -18,7 +18,7 @@ import {ObjectUtils} from '../util/objectutils';
 import {FormsModule} from '@angular/forms';
 
 @Component({
-  selector: 'p-rowExpansionLoader',
+  selector: 'm-rowExpansionLoader',
   template: ``
 })
 export class RowExpansionLoader implements OnInit, OnDestroy {
@@ -38,6 +38,27 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
       '\$implicit': this.rowData,
       'rowIndex': this.rowIndex
     });
+  }
+
+  ngOnDestroy() {
+    this.view.destroy();
+  }
+}
+
+@Component({
+  selector: 'm-emptyTableLoader',
+  template: ``
+})
+export class EmptyTableLoader implements OnInit, OnDestroy {
+
+  @Input() template: TemplateRef<any>;
+
+  view: EmbeddedViewRef<any>;
+
+  constructor(public viewContainer: ViewContainerRef) {}
+
+  ngOnInit() {
+    this.view = this.viewContainer.createEmbeddedView(this.template);
   }
 
   ngOnDestroy() {
@@ -68,10 +89,10 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
           </button>
         </div>
           
-        <button mat-icon-button *ngIf="header.colSetting" class="col-setting-btn" (click)="toggleColSetting()">
+        <button mat-icon-button *ngIf="header.colSetting" class="col-setting-btn" (click)="openColSetting()">
           <mat-icon class="mat-24" aria-label="column">view_column</mat-icon>
         </button>
-        <mat-card class="col-setting-wrapper" *ngIf="colSettingOpen">
+        <mat-card class="col-setting-wrapper" *ngIf="colSettingOpen" (click)="$event.stopPropagation()">
           <mat-selection-list>
             <mat-list-option [selected]="!col.hidden" [value]="col.header" (click)="toggleColumn(col)" checkboxPosition="'before'" *ngFor="let col of dt.columns">
               {{col.header}}
@@ -103,6 +124,10 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
 
   globalFilterFunction: any;
 
+  documentEditListener: Function;
+
+  colToggleClick: boolean = false;
+
   constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable, public renderer: Renderer2) { };
 
   ngAfterViewInit(){
@@ -123,18 +148,47 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
     this.searchOpen = state;
   }
 
-  toggleColSetting() {
-    this.colSettingOpen = !this.colSettingOpen;
+  openColSetting() {
+    this.colSettingOpen = true;
+    this.colToggleClick = true;
+    this.bindDocumentEditListener();
+  }
+
+  closeColSetting() {
+    this.colSettingOpen = false;
+    if(!this.colToggleClick)
+      this.unbindDocumentEditListener();
   }
 
   toggleColumn(col) {
     col.hidden = !col.hidden;
   }
 
+  bindDocumentEditListener() {
+    if(!this.documentEditListener) {
+      this.documentEditListener = this.renderer.listen('document', 'click', (event) => {
+        this.closeColSetting();
+      });
+    }
+    setTimeout(() => {
+      this.colSettingOpen = true;
+      this.colToggleClick = false;
+    }, 0);
+  }
+
+  unbindDocumentEditListener() {
+    if(this.documentEditListener) {
+      this.documentEditListener();
+      this.documentEditListener = null;
+    }
+  }
+
   ngOnDestroy(){
     if(this.globalFilterFunction) {
       this.globalFilterFunction();
     }
+
+    this.unbindDocumentEditListener();
   }
 
 }
@@ -239,10 +293,16 @@ export class ColumnFooterComponent {
       </tr>
       <tr *ngIf="dt.expandable && dt.isRowExpanded(row)" class="ui-expanded-row-content">
         <td [attr.colspan]="dt.totalColumns()">
-          <p-rowExpansionLoader [rowData]="row" [rowIndex]="rowIndex" [template]="dt.expansionTemplate"></p-rowExpansionLoader>
+          <m-rowExpansionLoader [rowData]="row" [rowIndex]="rowIndex" [template]="dt.expansionTemplate"></m-rowExpansionLoader>
         </td>
       </tr>
     </ng-template>
+    
+    <tr *ngIf="dt.isEmpty()" class="ui-empty-row">
+      <td [attr.colspan]="dt.totalColumns()">
+        <m-emptyTableLoader [template]="dt.emptyTableTemplate"></m-emptyTableLoader>
+      </td>
+    </tr>
   `
 })
 export class TableBodyComponent {
@@ -344,6 +404,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   public expansionTemplate: TemplateRef<any>;
 
+  public emptyTableTemplate: TemplateRef<any>;
+
   public editorClick: boolean;
 
   public editingCell: any;
@@ -378,6 +440,9 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       switch(item.getType()) {
         case 'expansion':
           this.expansionTemplate = item.template;
+          break;
+        case 'emptyTable':
+          this.emptyTableTemplate = item.template;
           break;
       }
     });
@@ -528,6 +593,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     }
     return false;
   };
+
+  isEmpty() {
+    return !this.dataToRender||(this.dataToRender.length == 0);
+  }
 
   sort(event, column: ColumnComponent) {
     if(!column.sortable) {
@@ -1007,6 +1076,6 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 @NgModule({
   imports: [CommonModule, MaterialModule, BrowserAnimationsModule, SharedModule, FormsModule],
   exports: [DataTable, SharedModule],
-  declarations: [DataTable, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, RowExpansionLoader]
+  declarations: [DataTable, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, EmptyTableLoader, RowExpansionLoader]
 })
 export class TableModule { }

@@ -7,7 +7,7 @@
          (valueChange)="valueChange($event)" (onFilter)="onFilter($event)"
          (onReload)="tableReload()" (onPage)="onPage($event)">
 
-  <m-header title="Countries" [globalSearch]="true" [colSetting]="true" [reload]="true" [export]="true" [exportSelectionOnly]="true">
+  <m-header title="Countries" [globalSearch]="true" [colSetting]="true" [reload]="true" [export]="true">
     <!--<ng-template let-header>-->
       <!--<div>-->
         <!--<button>Hello</button>-->
@@ -45,6 +45,10 @@
     {{index}} - {{row.country}}
     <br>
     <img [src]="row.flag" width="100px" style="padding: 20px 0px;">
+  </ng-template>
+
+  <ng-template mTemplate="emptyTable">
+    {{emptyMsg}}
   </ng-template>
 </m-table>
 

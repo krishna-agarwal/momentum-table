@@ -8,6 +8,7 @@ import {Component, OnInit} from '@angular/core';
 export class AppComponent implements OnInit{
   selectedRows;
   countries;
+  emptyMsg: string = 'loading...';
   constructor() {
 
   }
@@ -95,6 +96,10 @@ export class AppComponent implements OnInit{
 
   onFilter(val){
     console.log('filter change', val);
+    if(!val.length)
+      this.emptyMsg = 'No data found';
+    else
+      this.emptyMsg = '';
   }
 
   tableReload(){

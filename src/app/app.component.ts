@@ -13,7 +13,7 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit(){
-    // setTimeout( () => {
+    setTimeout( () => {
       this.countries = [
         {'country': 'Afghanistan', 'population': 35530081, 'capital': 'Kabul', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Afghanistan.jpg'},
         {'country': 'India', 'population': 1339180127, 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'},
@@ -29,7 +29,7 @@ export class AppComponent implements OnInit{
         {'country': 'Canada', 'population': 36624199, 'capital': 'Ottawa', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Canada.jpg'},
         {'country': 'Jamaica', 'population': 2890299, 'capital': 'Kingston', 'continent': 'America', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Jamaica.jpg'}
       ];
-    // }, 2000);
+     }, 2000);
 
   }
 

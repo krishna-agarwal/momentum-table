@@ -1341,7 +1341,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
 @NgModule({
   imports: [CommonModule, MaterialModule, FormsModule],
-  exports: [DataTable, ColumnComponent, MomentumTemplate, GlobalHeaderTemplateLoader, GlobalFooterTemplateLoader, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader],
+  exports: [DataTable, ColumnComponent, MomentumTemplate, Header, Footer],
   declarations: [DataTable, ColumnComponent, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, EmptyTableLoader, RowExpansionLoader, MomentumTemplate, GlobalHeaderTemplateLoader, GlobalFooterTemplateLoader, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
 })
 export class TableModule { }

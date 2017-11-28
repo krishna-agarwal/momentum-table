@@ -1,586 +1,32 @@
 import {
   AfterContentChecked,
-  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, Directive, DoCheck, ElementRef,
-  EmbeddedViewRef,
+  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, Directive, DoCheck,
   EventEmitter,
-  forwardRef,
-  Inject, Input, IterableDiffers,
-  NgModule, OnChanges, OnDestroy, OnInit,
+  Input, IterableDiffers,
+  NgModule, OnDestroy, OnInit,
   Output,
-  QueryList, Renderer2, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef
+  QueryList, Renderer2, TemplateRef
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MaterialModule} from '../common/material';
-import {DomHandler} from '../dom/domhandler';
-import {ObjectUtils} from '../util/objectutils';
+import {MaterialModule} from '../material';
+import {DomHandler} from '../services/domhandler.service';
+import {ObjectUtils} from '../services/util.service';
 import {FormsModule} from '@angular/forms';
+import {ColumnComponent, ColumnEditorTemplateLoader} from './columns';
+import {ColumnBodyTemplateLoader, EmptyTableLoader, RowExpansionLoader, TableBodyComponent} from './body';
+import {GlobalHeaderTemplateLoader, Header, HeaderComponent} from './header';
+import {Footer, FooterComponent, GlobalFooterTemplateLoader} from './footer';
+import {ColumnHeaderComponent, ColumnHeaderTemplateLoader} from './column-header';
+import {ColumnFooterComponent, ColumnFooterTemplateLoader} from './column-footer';
+import {MomentumTemplate} from './template.directive';
 
 
-@Directive({
-  selector: '[mTemplate]'
-})
-export class MomentumTemplate{
-  @Input('mTemplate') type: string;
 
-  constructor(public template: TemplateRef<any>) {}
-
-  getType(): string {
-    return this.type;
-  }
-}
-
-@Component({
-  selector: 'm-header',
-  template: ``
-})
-export class Header {
-  @Input() title: string;
-  @Input() globalSearch: boolean = false;
-  @Input() colSetting: boolean = true;
-  @Input() export: boolean = false;
-  @Input() csvSeparator: string = ',';
-  @Input() exportFilename: string = 'download';
-  @Input() exportSelectionOnly: boolean = false;
-  @Input() reload: boolean = false;
-
-  @ContentChild(TemplateRef) template: TemplateRef<any>;
-  constructor(){ }
-}
-
-@Component({
-  selector: 'm-globalHeaderTemplateLoader',
-  template: ``
-})
-export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy {
-
-  @Input() header: any;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.header.template, {
-      '\$implicit': this.header
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if(!this.view) {
-      return;
-    }
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: 'm-footer',
-  template: ``
-})
-export class Footer {
-  @Input() paginator: boolean = false;
-  @Input() pageSize: number = 10;
-  @Input() pageSizeOptions: number[] = [5, 10, 25];
-  @ContentChild(TemplateRef) template: TemplateRef<any>;
-
-  constructor() { }
-}
-
-@Component({
-  selector: 'm-globalFooterTemplateLoader',
-  template: ``
-})
-export class GlobalFooterTemplateLoader implements OnInit, OnChanges, OnDestroy {
-
-  @Input() footer: any;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.footer.template, {
-      '\$implicit': this.footer
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if(!this.view) {
-      return;
-    }
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: 'm-column',
-  template: ``
-})
-export class ColumnComponent implements AfterContentInit{
-  @Input() field: string;
-  @Input() header: string;
-  @Input() footer: string;
-  @Input() sortable: boolean;
-  @Input() editable: boolean;
-  @Input() hidden: boolean;
-  @Input() frozen: boolean;
-
-  @ContentChildren(MomentumTemplate) templates: QueryList<any>;
-
-  public headerTemplate: TemplateRef<any>;
-  public bodyTemplate: TemplateRef<any>;
-  public footerTemplate: TemplateRef<any>;
-  public editorTemplate: TemplateRef<any>;
-
-  constructor() {
-  }
-
-  ngAfterContentInit(){
-    this.templates.forEach((item) => {
-      switch(item.getType()){
-        case 'header':
-          this.headerTemplate = item.template;
-          break;
-
-        case 'body':
-          this.bodyTemplate = item.template;
-          break;
-
-        case 'footer':
-          this.footerTemplate = item.template;
-          break;
-
-        case 'editor':
-          this.editorTemplate = item.template;
-          break;
-
-        default:
-          this.bodyTemplate = item.template;
-          break;
-      }
-    })
-  }
-}
-
-
-@Component({
-  selector: 'm-columnBodyTemplateLoader',
-  template: ``
-})
-export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
-
-  @Input() column: any;
-
-  @Input() row: any;
-
-  @Input() rowIndex: number;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.bodyTemplate, {
-      '\$implicit': this.column,
-      'row': this.row,
-      'rowIndex': this.rowIndex
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if(!this.view) {
-      return;
-    }
-
-    if('rowIndex' in changes) {
-      this.view.context.rowIndex = changes['rowIndex'].currentValue;
-    }
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: 'm-columnHeaderTemplateLoader',
-  template: ``
-})
-export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
-
-  @Input() column: any;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.headerTemplate, {
-      '\$implicit': this.column
-    });
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: 'm-columnFooterTemplateLoader',
-  template: ``
-})
-export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
-
-  @Input() column: any;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.footerTemplate, {
-      '\$implicit': this.column
-    });
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: 'm-columnEditorTemplateLoader',
-  template: ``
-})
-export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
-
-  @Input() column: any;
-
-  @Input() row: any;
-
-  @Input() rowIndex: any;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.editorTemplate, {
-      '\$implicit': this.column,
-      'row': this.row,
-      'rowIndex': this.rowIndex
-    });
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: 'm-rowExpansionLoader',
-  template: ``
-})
-export class RowExpansionLoader implements OnInit, OnDestroy {
-
-  @Input() template: TemplateRef<any>;
-
-  @Input() rowData: any;
-
-  @Input() rowIndex: any;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.template, {
-      '\$implicit': this.rowData,
-      'rowIndex': this.rowIndex
-    });
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: 'm-emptyTableLoader',
-  template: ``
-})
-export class EmptyTableLoader implements OnInit, OnDestroy {
-
-  @Input() template: TemplateRef<any>;
-
-  view: EmbeddedViewRef<any>;
-
-  constructor(public viewContainer: ViewContainerRef) {}
-
-  ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.template);
-  }
-
-  ngOnDestroy() {
-    this.view.destroy();
-  }
-}
-
-@Component({
-  selector: '[mHeader]',
-  template: `
-    <div *ngIf="header.template" class="table-header">
-      <m-globalHeaderTemplateLoader [header]="header"></m-globalHeaderTemplateLoader>
-    </div>
-    
-    <div *ngIf="!header.template" class="table-header">
-      <div *ngIf="header.title && !dt.itemsSelected()" class="table-header-title">{{header.title}}</div>
-      <div *ngIf="dt.itemsSelected()" class="table-header-selection-count">{{dt.itemsSelected()}} item(s) selected</div>
-      <div class="tool-box">
-        <div class="search-setting-wrapper">
-          <mat-form-field class="ui-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
-            <input matInput #globalFilterField placeholder="Search..." *ngIf="header.globalSearch">
-          </mat-form-field>
-          <button mat-icon-button *ngIf="!searchOpen" class="search-icon" (click)="toggleSearch(true)">
-            <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">search</mat-icon>
-          </button>
-          <button mat-icon-button *ngIf="searchOpen" class="search-icon" (click)="toggleSearch(false)">
-            <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">clear</mat-icon>
-          </button>
-        </div>
-          
-        <button mat-icon-button *ngIf="header.colSetting" class="col-setting-btn" (click)="openColSetting()">
-          <mat-icon class="mat-24" aria-label="column">view_column</mat-icon>
-        </button>
-        <mat-card class="col-setting-wrapper" *ngIf="colSettingOpen" (click)="$event.stopPropagation()">
-          <mat-selection-list>
-            <mat-list-option [selected]="!col.hidden" [value]="col.header" (click)="toggleColumn(col)" checkboxPosition="'before'" *ngFor="let col of dt.columns">
-              {{col.header}}
-            </mat-list-option>
-          </mat-selection-list>
-        </mat-card>
-
-        <button mat-icon-button *ngIf="header.export" class="col-setting-btn"  (click)="dt.exportCSV(header.csvSeparator, header.exportFilename, header.exportSelectionOnly)">
-          <mat-icon class="mat-24" aria-label="download">file_download</mat-icon>
-        </button>
-        
-        <button mat-icon-button *ngIf="header.reload" class="col-setting-btn" (click)="dt.reload()">
-          <mat-icon class="mat-24" aria-label="refresh">refresh</mat-icon>
-        </button>
-      </div>
-      
-    </div>
-  `
-})
-export class HeaderComponent implements AfterViewInit, OnDestroy{
-  @Input('mHeader') header: Header;
-
-  @Output() filterChange: EventEmitter<string> = new EventEmitter();
-
-  @ViewChild('globalFilterField') globalFilterField: ElementRef;
-
-  searchOpen = false;
-  colSettingOpen = false;
-
-  globalFilterFunction: any;
-
-  documentEditListener: Function;
-
-  colToggleClick: boolean = false;
-
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable, public renderer: Renderer2) { };
-
-  ngAfterViewInit(){
-    if(this.globalFilterField){
-      this.globalFilterFunction = this.renderer.listen(this.globalFilterField.nativeElement, 'keyup', () => {
-        this.filterChange.emit(this.globalFilterField.nativeElement.value);
-      });
-    }
-  }
-
-  toggleSearch(state: boolean){
-    if(!state){
-      this.globalFilterField.nativeElement.value = '';
-      this.filterChange.emit('');
-    }else {
-      this.globalFilterField.nativeElement.focus();
-    }
-    this.searchOpen = state;
-  }
-
-  openColSetting() {
-    this.colSettingOpen = true;
-    this.colToggleClick = true;
-    this.bindDocumentEditListener();
-  }
-
-  closeColSetting() {
-    this.colSettingOpen = false;
-    if(!this.colToggleClick)
-      this.unbindDocumentEditListener();
-  }
-
-  toggleColumn(col) {
-    col.hidden = !col.hidden;
-  }
-
-  bindDocumentEditListener() {
-    if(!this.documentEditListener) {
-      this.documentEditListener = this.renderer.listen('document', 'click', (event) => {
-        this.closeColSetting();
-      });
-    }
-    setTimeout(() => {
-      this.colSettingOpen = true;
-      this.colToggleClick = false;
-    }, 0);
-  }
-
-  unbindDocumentEditListener() {
-    if(this.documentEditListener) {
-      this.documentEditListener();
-      this.documentEditListener = null;
-    }
-  }
-
-  ngOnDestroy(){
-    if(this.globalFilterFunction) {
-      this.globalFilterFunction();
-    }
-
-    this.unbindDocumentEditListener();
-  }
-
-}
-
-@Component({
-  selector: '[mFooter]',
-  template: `
-    <div *ngIf="footer.template" class="table-footer">
-      <m-globalFooterTemplateLoader [footer]="footer"></m-globalFooterTemplateLoader>
-    </div>
-    
-    <div *ngIf="!footer.template" class="table-footer">
-      <div *ngIf="footer.paginator">
-        <mat-paginator (page)="dt.pageChange($event)" [length]="dt.totalRecords" [pageIndex]="dt.pageIndex" [pageSize]="footer.pageSize" [pageSizeOptions]="footer.pageSizeOptions"></mat-paginator>
-      </div>
-    </div>
-  `
-})
-export class FooterComponent {
-  @Input('mFooter') footer: Footer;
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
-}
-
-@Component({
-  selector: '[mColumnHeader]',
-  template: `
-    <tr>
-      <th *ngIf="dt.selectionHandler == true" class="ui-checkbox-header">
-        <mat-checkbox [disabled]="dt.selectionMode == 'single'" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
-      </th>
-      <th [hidden]="col.hidden" *ngFor="let col of columns" (click)="dt.sort($event,col)" 
-          [ngClass]="{'ui-sortable-column': col.sortable}">
-        <span *ngIf="!col.headerTemplate">{{ col.header }}</span>
-        <span *ngIf="col.headerTemplate">
-          <m-columnHeaderTemplateLoader [column]="col"></m-columnHeaderTemplateLoader>
-        </span>
-        <span class="ui-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == -1">arrow_downward</span>
-        <span class="ui-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == 1">arrow_upward</span>
-      </th>
-      <th *ngIf="dt.expandable == true" style="padding-left: 0px;" class="ui-expand-header">
-      </th>
-    </tr>
-  `
-})
-export class ColumnHeaderComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
-  @Input('mColumnHeader') columns: ColumnComponent[];
-}
-
-@Component({
-  selector: '[mColumnFooter]',
-  template: `
-    <tr>
-      <td *ngIf="dt.selectionHandler == true">
-      </td>
-      <td [hidden]="col.hidden" *ngFor="let col of columns">
-        <span *ngIf="!col.footerTemplate">{{ col.footer }}</span>
-        <span *ngIf="col.footerTemplate">
-          <m-columnFooterTemplateLoader [column]="col"></m-columnFooterTemplateLoader>
-        </span>
-      </td>
-      <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
-      </td>
-    </tr>
-  `
-})
-export class ColumnFooterComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
-  @Input('mColumnFooter') columns: ColumnComponent[];
-}
-
-@Component({
-  selector: '[mTableBody]',
-  template: `
-    <ng-template ngFor let-row [ngForOf]="value" let-even="even" let-odd="odd" let-rowIndex="index">
-      <tr (click)="dt.handleRowClick($event, row, rowIndex)" [ngClass]="[dt.isSelected(row)? 'ui-row-selected': '']">
-        <td *ngIf="dt.selectionHandler == true">
-          <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
-        </td>
-        <td #cell [hidden]="col.hidden" *ngFor="let col of columns" [ngClass]="{'ui-editable-column':col.editable, 'ui-clickable':col.editable}" (click)="dt.switchCellToEditMode(cell,col,row)">
-          <span class="ui-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'ui-clickable':col.editable}">{{row[col.field]}}</span>
-          <span class="ui-cell-data" *ngIf="col.bodyTemplate">
-            <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
-          </span>
-          <div class="ui-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable">
-            <mat-card matInput class="ui-input-card" *ngIf="!col.editorTemplate">
-              <mat-form-field [floatPlaceholder]="'never'" class="ui-input-form">
-                <input matInput placeholder="{{col.header}}" [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)" 
-                       (keydown)="dt.onCellEditorKeydown($event, col, row, rowIndex)" (blur)="dt.onCellEditorBlur($event, col, row, rowIndex)"
-                       (input)="dt.onCellEditorInput($event, col, row, rowIndex)">
-              </mat-form-field>
-            </mat-card>
-            <m-columnEditorTemplateLoader *ngIf="col.editorTemplate" (click)="$event.stopPropagation()" [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnEditorTemplateLoader>
-          </div>
-        </td>
-        <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
-          <span class="ui-expand-icon material-icons" (click)="dt.toggleRow(row, $event)">
-            <i class="material-icons ui-clickable" *ngIf="!dt.isRowExpanded(row)">keyboard_arrow_right</i>
-            <i class="material-icons ui-clickable" *ngIf="dt.isRowExpanded(row)">keyboard_arrow_down</i>
-          </span>
-        </td>
-      </tr>
-      <tr *ngIf="dt.expandable && dt.isRowExpanded(row)" class="ui-expanded-row-content">
-        <td [attr.colspan]="dt.totalColumns()">
-          <m-rowExpansionLoader [rowData]="row" [rowIndex]="rowIndex" [template]="dt.expansionTemplate"></m-rowExpansionLoader>
-        </td>
-      </tr>
-    </ng-template>
-    
-    <tr *ngIf="dt.isEmpty()" class="ui-empty-row">
-      <td [attr.colspan]="dt.totalColumns()">
-        <m-emptyTableLoader [template]="dt.emptyTableTemplate"></m-emptyTableLoader>
-      </td>
-    </tr>
-  `
-})
-export class TableBodyComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
-  @Input('mTableBody') columns: ColumnComponent[];
-  @Input() value;
-}
 
 @Component({
   selector: 'm-table',
   template: `
-    <mat-card [ngClass]="{'ui-datatable ui-widget':true}" [ngStyle]="{'width': width, 'height': height}" class="card-wrapper">
+    <mat-card [ngClass]="{'m-datatable m-widget':true}" [ngStyle]="{'width': width, 'height': height}" class="card-wrapper">
       <div *ngIf="header" [mHeader]="header" (filterChange)="filterChange($event)"></div>
       <div class="table-container">
         <table>
@@ -592,6 +38,26 @@ export class TableBodyComponent {
       <div *ngIf="footer" [mFooter]="footer"></div>
     </mat-card>
   `,
+  styles: [`
+    .card-wrapper{
+      padding: 0px !important;
+    }
+    .table-container{
+      width: 100%;
+      overflow: scroll;
+      background: #fff;
+      display: inline-block !important;
+      font-family: Roboto,Helvetica Neue,sans-serif !important;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.87);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      position: relative;
+    }
+  `],
   providers: [DomHandler, ObjectUtils]
 })
 export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, DoCheck, AfterContentChecked {
@@ -869,7 +335,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       return;
     }
     const targetNode = event.target.nodeName;
-    if(targetNode === 'TH' && this.domHandler.hasClass(event.target, 'ui-sortable-column') || ((targetNode === 'SPAN' || targetNode === 'DIV') && !this.domHandler.hasClass(event.target, 'ui-clickable'))){
+    if(targetNode === 'TH' && this.domHandler.hasClass(event.target, 'm-sortable-column') || ((targetNode === 'SPAN' || targetNode === 'DIV') && !this.domHandler.hasClass(event.target, 'm-clickable'))){
       this.sortColumn = column;
       // todo sort logic
 
@@ -928,7 +394,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
     const targetNode = (<HTMLElement> event.target).nodeName;
 
-    if(targetNode === 'INPUT' || targetNode === 'BUTTON' || targetNode === 'A' || (this.domHandler.hasClass(event.target, 'ui-clickable'))) {
+    if(targetNode === 'INPUT' || targetNode === 'BUTTON' || targetNode === 'A' || (this.domHandler.hasClass(event.target, 'm-clickable'))) {
       return;
     }
 
@@ -1119,13 +585,13 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
       if(cell != this.editingCell) {
         if(this.editingCell && this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty').length == 0) {
-          this.domHandler.removeClass(this.editingCell, 'ui-cell-editing');
+          this.domHandler.removeClass(this.editingCell, 'm-cell-editing');
         }
 
         this.editingCell = cell;
         this.onEditInit.emit({column: column, data: rowData});
-        this.domHandler.addClass(cell, 'ui-cell-editing');
-        let focusable = this.domHandler.findSingle(cell, '.ui-cell-editor input');
+        this.domHandler.addClass(cell, 'm-cell-editing');
+        let focusable = this.domHandler.findSingle(cell, '.m-cell-editor input');
         if(focusable) {
           setTimeout(() => this.domHandler.invokeElementMethod(focusable, 'focus'), 50);
         }
@@ -1137,13 +603,13 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   switchCellToViewMode(element: any) {
     this.editingCell = null;
     let cell = this.findCell(element);
-    this.domHandler.removeClass(cell, 'ui-cell-editing');
+    this.domHandler.removeClass(cell, 'm-cell-editing');
     this.unbindDocumentEditListener();
   }
 
   closeCell() {
     if(this.editingCell) {
-      this.domHandler.removeClass(this.editingCell, 'ui-cell-editing');
+      this.domHandler.removeClass(this.editingCell, 'm-cell-editing');
       this.editingCell = null;
       this.unbindDocumentEditListener();
     }

@@ -1,6 +1,6 @@
 # MomentumTable
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.2.7.
+MomentumTable is material based rich DataTable component for Angular.
 
 ## Development server
 

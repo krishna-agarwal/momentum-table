@@ -1,1 +1,1 @@
-export * from './src/app/components/datatable/datatable';
+export * from './src/app/lib/datatable/datatable';

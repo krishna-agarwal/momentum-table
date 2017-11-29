@@ -1,28 +1,94 @@
 # MomentumTable
 
-MomentumTable is material based rich DataTable component for Angular.
+MomentumTable is material based rich DataTable component for Angular. It is based on [material DataTable guidline](https://material.io/guidelines/components/data-tables.html#data-tables-structure).
 
-## Development server
+[Demo](https://momentum-table-demo.stackblitz.io/)
+## Features
+* Searching
+* Sorting
+* Row Selection (Single, Multi, Checkbox)
+* Expandable Row
+* Pagination
+* Cell Templates(header, body, footer)
+* Editing(inline/template)
+* Empty Row templating
+* Column Toggling
+* Export CSV
+* Card Header and Footer(with template support)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Installation
+Install MomemtumTable via [npm](https://www.npmjs.com/package/momentum-table)
+```javascript
+npm install momentum-table --save
+```
+### Dependency
 
-## Code scaffolding
+MomentumTable is dependent on [angular material](https://material.angular.io/). 
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+If you don't have
+material please refer [getting started](https://material.angular.io/guide/getting-started) guide of angular material.
 
-## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+## Usage
 
-## Running unit tests
+After installing from npm, include `TableModule` in your application Module.
+```javascript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+import { AppComponent } from './app.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {TableModule} from 'momentum-table';
 
-## Running end-to-end tests
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    TableModule,
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+**Note** : `BrowserAnimationsModule` or `NoopAnimationModule` is required.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
+Basic use of table in component : 
+```javascript
+import { Component } from '@angular/core';
 
-## Further help
+@Component({
+  selector: 'app',
+  template: `
+    <m-table [value]=countries>
+    	<m-column field="country" header="Country"></m-column>
+  		<m-column field="population" header="Population"></m-column>
+  		<m-column field="capital" header="Capital"></m-column>
+  		<m-column field="continent" header="Continent"></m-column>
+    </m-table>
+  `
+})
+export class AppComponent {
+  countries = [
+        {'country': 'Afghanistan', 'population': 35530081, 'capital': 'Kabul', 'continent': 'Asia'},
+        {'country': 'India', 'population': 1339180127, 'capital': 'New Delhi', 'continent': 'Asia'},
+        {'country': 'France', 'population': 64979548, 'capital': 'Paris', 'continent': 'Europe'},
+        {'country': 'Germany', 'population': 82114224, 'capital': 'Berlin', 'continent': 'Europe'},
+        {'country': 'Austria', 'population': 8735453, 'capital': 'Vienna', 'continent': 'Europe'}
+      ];
+}
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+For all features please follow [documentation](https://github.com/krishna-agarwal/momentum-table/wiki/Documentation)
+
+
+## Documentation and Demo
+[Demo](https://momentum-table-demo.stackblitz.io/)
+[documentation](https://github.com/krishna-agarwal/momentum-table/wiki/Documentation)
+
+
+
+

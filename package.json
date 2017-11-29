@@ -1,6 +1,6 @@
 {
   "name": "momentum-table",
-  "version": "0.0.0",
+  "version": "0.1.2",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -12,6 +12,20 @@
     "packagr": "ng-packagr -p ng-package.json"
   },
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krishna-agarwal/momentum-table.git"
+  },
+  "keywords": [
+    "angular",
+    "javascript",
+    "angular2",
+    "datatable",
+    "grid",
+    "table",
+    "material"
+  ],
+  "homepage": "https://github.com/krishna-agarwal/momentum-table",
   "peerDependencies": {
     "@angular/animations": "^4.4.6",
     "@angular/cdk": "^2.0.0-beta.12",

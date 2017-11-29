@@ -810,4 +810,4 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   exports: [DataTable, ColumnComponent, MomentumTemplate, Header, Footer],
   declarations: [DataTable, ColumnComponent, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, EmptyTableLoader, RowExpansionLoader, MomentumTemplate, GlobalHeaderTemplateLoader, GlobalFooterTemplateLoader, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
 })
-export class TableModule { }
+export class MomentumTableModule { }

@@ -31,14 +31,14 @@ material please refer [getting started](https://material.angular.io/guide/gettin
 
 ## Usage
 
-After installing from npm, include `TableModule` in your application Module.
+After installing from npm, include `MomentumTableModule` in your application Module.
 ```javascript
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {TableModule} from 'momentum-table';
+import {MomentumTableModule} from 'momentum-table';
 
 @NgModule({
   declarations: [
@@ -47,7 +47,7 @@ import {TableModule} from 'momentum-table';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    TableModule,
+    MomentumTableModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
@@ -87,6 +87,7 @@ For all features please follow [documentation](https://github.com/krishna-agarwa
 
 ## Documentation and Demo
 [Demo](https://momentum-table-demo.stackblitz.io/)
+
 [documentation](https://github.com/krishna-agarwal/momentum-table/wiki/Documentation)
 
 

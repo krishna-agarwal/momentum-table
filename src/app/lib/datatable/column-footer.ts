@@ -44,14 +44,27 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
     </tr>
   `,
   styles: [`
+    td{
+      position: relative;
+    }
     tr {
       text-align: left;
       font-size: 12px;
       height: 51px;
-      color: rgba(0, 0, 0, 0.54);;
+      color: rgba(0, 0, 0, 0.54);
+      border-top: 1px solid #e0e0e0;
     }
     tr:hover{
       background: #fff;
+    }
+    td:not(:first-child){
+      padding: 0px 28px;
+    }
+    td:first-child{
+      padding-left: 24px;
+    }
+    td:last-child{
+      padding-right: 24px;
     }
   `]
 })

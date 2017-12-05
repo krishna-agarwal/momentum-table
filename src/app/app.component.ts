@@ -9,6 +9,8 @@ export class AppComponent implements OnInit{
   selectedRows;
   countries;
   emptyMsg: string = 'loading...';
+  pageIndex: number = 0;
+  totalRecord: number = 13;
   constructor() {
 
   }
@@ -36,7 +38,16 @@ export class AppComponent implements OnInit{
 
   changeSort(event) {
     console.log('sort', event);
-  };
+    this.countries = [];
+    this.emptyMsg = 'Loading...';
+    setTimeout( () => {
+      this.countries = [
+        {'country': 'Afghanistan', 'population': 35530081, 'capital': 'Kabul', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Afghanistan.jpg'},
+        {'country': 'India', 'population': 1339180127, 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'},
+        {'country': 'Iraq', 'population': 38274618, 'capital': 'Baghdad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Iraq.jpg'},
+      ];
+    }, 2000);
+  }
 
   rowClick(event) {
     console.log('click', event);
@@ -100,6 +111,8 @@ export class AppComponent implements OnInit{
       this.emptyMsg = 'No data found';
     else
       this.emptyMsg = '';
+
+    this.pageIndex = 0
   }
 
   tableReload(){
@@ -108,5 +121,17 @@ export class AppComponent implements OnInit{
 
   onPage(val){
     console.log('pagechange', val);
+
+    // this.countries = [];
+    // this.emptyMsg = 'Loading...';
+    // setTimeout( () => {
+    //   this.countries = [
+    //     {'country': 'France', 'population': 64979548, 'capital': 'Paris', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/France.jpg'},
+    //     {'country': 'Germany', 'population': 82114224, 'capital': 'Berlin', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Germany.jpg'},
+    //     {'country': 'Ireland', 'population': 4761657, 'capital': 'Dublin', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Ireland.jpg'},
+    //     {'country': 'Austria', 'population': 8735453, 'capital': 'Vienna', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Austria.jpg'},
+    //     {'country': 'Bulgaria', 'population': 7084571, 'capital': 'Sofia', 'continent': 'Europe', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Bulgaria.jpg'},
+    //   ];
+    // }, 2000);
   }
 }

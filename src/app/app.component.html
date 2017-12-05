@@ -1,20 +1,22 @@
 <m-table [value]=countries
-         [sortField]="'country'" [sortOrder]="1" (onSort)="changeSort($event)"
+         [sortField]="'country'" [sortOrder]="1" [sortLocal]="true" (onSort)="changeSort($event)"
          (onRowClick)="rowClick($event)"
          [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows"
          [expandable]="true" [expandMultiple]="true" (onRowExpand)="rowExpanded($event)" (onRowCollapse)="rowCollapse($event)"
          (onEditComplete)="editComplete($event)" (onEditInit)="editInit($event)" (onEdit)="edit($event)" (onEditCancel)="editCancel($event)"
-         (valueChange)="valueChange($event)" (onFilter)="onFilter($event)"
-         (onReload)="tableReload()" (onPage)="onPage($event)">
+         (valueChange)="valueChange($event)"
+         (onFilter)="onFilter($event)" [filterLocal]="true"
+         (onReload)="tableReload()"
+         (onPage)="onPage($event)">
 
-  <m-header title="Countries" [globalSearch]="true" [colSetting]="true" [reload]="true" [export]="true">
+  <m-header title="Countries" [globalSearch]="true" [searchField]="'box'" [colSetting]="true" [reload]="true" [export]="true">
     <!--<ng-template let-header>-->
       <!--<div>-->
         <!--<button>Hello</button>-->
       <!--</div>-->
     <!--</ng-template>-->
   </m-header>
-  <m-footer [paginator]="true"></m-footer>
+  <m-footer [paginator]="true" [pageSize]="5"></m-footer>
 
   <m-column field="country" header="Country" [sortable]="true" [editable]="true"></m-column>
 

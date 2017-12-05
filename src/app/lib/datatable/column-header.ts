@@ -36,7 +36,7 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
         <mat-checkbox [disabled]="dt.selectionMode == 'single'" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
       </th>
       <th [hidden]="col.hidden" *ngFor="let col of columns" (click)="dt.sort($event,col)"
-          [ngClass]="{'m-sortable-column': col.sortable}">
+          [ngClass]="[col.class ? col.class : '', col.sortable ? 'm-sortable-column': '']">
         <span *ngIf="!col.headerTemplate">{{ col.header }}</span>
         <span *ngIf="col.headerTemplate">
           <m-columnHeaderTemplateLoader [column]="col"></m-columnHeaderTemplateLoader>

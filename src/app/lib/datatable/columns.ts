@@ -45,6 +45,7 @@ export class ColumnComponent implements AfterContentInit{
   @Input() editable: boolean;
   @Input() hidden: boolean;
   @Input() frozen: boolean;
+  @Input() class: any;
 
   @ContentChildren(MomentumTemplate) templates: QueryList<any>;
 

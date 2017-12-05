@@ -13,6 +13,8 @@ export class Footer {
   @Input() paginator: boolean = false;
   @Input() pageSize: number = 10;
   @Input() pageSizeOptions: number[] = [5, 10, 25];
+  @Input() length: number;
+  @Input() pageIndex: number;
   @ContentChild(TemplateRef) template: TemplateRef<any>;
 
   constructor() { }
@@ -56,7 +58,7 @@ export class GlobalFooterTemplateLoader implements OnInit, OnChanges, OnDestroy 
 
     <div *ngIf="!footer.template" class="table-footer">
       <div *ngIf="footer.paginator">
-        <mat-paginator (page)="dt.pageChange($event)" [length]="dt.totalRecords" [pageIndex]="dt.pageIndex" [pageSize]="footer.pageSize" [pageSizeOptions]="footer.pageSizeOptions"></mat-paginator>
+        <mat-paginator (page)="dt.pageChange($event)" [length]="(footer.length != undefined) ? footer.length : dt.totalRecords" [pageIndex]="(footer.pageIndex != undefined) ? footer.pageIndex : dt.pageIndex" [pageSize]="footer.pageSize" [pageSizeOptions]="footer.pageSizeOptions"></mat-paginator>
       </div>
     </div>
   `,

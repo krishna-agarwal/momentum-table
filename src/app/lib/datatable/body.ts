@@ -133,7 +133,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
 
     <tr *ngIf="dt.isEmpty()" class="m-empty-row">
       <td [attr.colspan]="dt.totalColumns()">
-        <m-emptyTableLoader [template]="dt.emptyTableTemplate"></m-emptyTableLoader>
+        <m-emptyTableLoader *ngIf="dt.emptyTableTemplate" [template]="dt.emptyTableTemplate"></m-emptyTableLoader>
       </td>
     </tr>
   `,

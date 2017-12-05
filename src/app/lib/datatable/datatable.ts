@@ -70,6 +70,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   @Output() onSort: EventEmitter<any> = new EventEmitter();
 
+  @Input() sortLocal: boolean = true;
+
   @Input() selectable: boolean;
 
   @Input() selectionMode: string = 'multiple';
@@ -105,6 +107,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   @Output() valueChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
   @Output() onFilter: EventEmitter<any> = new EventEmitter();
+
+  @Input() filterLocal: boolean = true;
 
   @Output() onReload: EventEmitter<string> = new EventEmitter();
 
@@ -184,13 +188,13 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   }
 
-  filterChange(val: string){
-    this.globalFilterString = val;
+  filterChange(event: any){
+    this.globalFilterString = event.value;
     if (this.filterTimeout) {
       clearTimeout(this.filterTimeout);
     }
     this.filterTimeout = setTimeout(() => {
-      this._filter();
+      this._filter(event.type);
       this.filterTimeout = null;
     }, 300);
   }
@@ -211,7 +215,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   set sortField(val: string){
     this._sortField = val;
-    this.sortSingle();
+    if(this.sortLocal)
+      this.sortSingle();
   }
 
   @Input() get sortOrder(): number {
@@ -219,7 +224,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
   set sortOrder(val: number) {
     this._sortOrder = val;
-    this.sortSingle();
+    if(this.sortLocal)
+      this.sortSingle();
   }
 
   @Input() get selection(): any{
@@ -254,7 +260,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       if(!this.sortColumn && this.columns) {
         this.sortColumn = this.columns.find(col => col.field === this.sortField);
       }
-      this.sortSingle();
+      if(this.sortLocal)
+        this.sortSingle();
     }
 
     this.updateDataToRender(this.filteredValue || this.value);
@@ -344,7 +351,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       this._sortField = columnSortField;
       this.sortColumn = column;
 
-      this.sortSingle();
+      if(this.sortLocal)
+        this.sortSingle();
 
       this.onSort.emit({
         field: this.sortField,
@@ -374,10 +382,6 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
         return (this.sortOrder * result);
       });
-
-      // if(this.hasFilter()) {
-      //   this._filter();
-      // }
     }
   }
 
@@ -677,7 +681,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     }
   }
 
-  _filter() {
+  _filter(type?: string) {
     if(!this.value || !this.columns) {
       return;
     }
@@ -704,11 +708,13 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       this.filteredValue = null;
     }
 
-    this.updateDataToRender(this.filteredValue || this.value);
+    if(this.filterLocal)
+      this.updateDataToRender(this.filteredValue || this.value);
 
     this.onFilter.emit({
         filterQuery: this.globalFilterString,
-        filteredValue: this.filteredValue || this.value
+        filteredValue: this.filteredValue || this.value,
+        type: type
     });
   }
 

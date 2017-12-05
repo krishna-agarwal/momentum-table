@@ -15,6 +15,7 @@ import {DataTable} from './datatable';
 export class Header {
   @Input() title: string;
   @Input() globalSearch: boolean = false;
+  @Input() searchField: string = 'line'
   @Input() colSetting: boolean = true;
   @Input() export: boolean = false;
   @Input() csvSeparator: string = ',';
@@ -66,16 +67,28 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
       <div *ngIf="header.title && !dt.itemsSelected()" class="table-header-title">{{header.title}}</div>
       <div *ngIf="dt.itemsSelected()" class="table-header-selection-count">{{dt.itemsSelected()}} item(s) selected</div>
       <div class="tool-box">
-        <div class="search-setting-wrapper">
-          <mat-form-field class="m-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
-            <input matInput #globalFilterField placeholder="Search..." *ngIf="header.globalSearch">
-          </mat-form-field>
-          <button mat-icon-button *ngIf="!searchOpen" class="search-icon" (click)="toggleSearch(true)">
-            <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">search</mat-icon>
-          </button>
-          <button mat-icon-button *ngIf="searchOpen" class="search-icon" (click)="toggleSearch(false)">
-            <mat-icon class="mat-24" aria-label="Example icon-button with a heart icon">clear</mat-icon>
-          </button>
+        <div class="search-setting-wrapper" *ngIf="header.globalSearch">
+          <div *ngIf="header.searchField == 'line'" class="line-search">
+            <mat-form-field class="m-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
+              <input matInput #globalFilterField placeholder="Search...">
+            </mat-form-field>
+            <button mat-icon-button *ngIf="!searchOpen" class="search-icon" (click)="toggleSearch(true)">
+              <mat-icon class="mat-24" aria-label="Search icon">search</mat-icon>
+            </button>
+            <button mat-icon-button *ngIf="searchOpen" class="search-icon" (click)="toggleSearch(false)">
+              <mat-icon class="mat-24" aria-label="Search icon">clear</mat-icon>
+            </button>
+          </div>
+          <div *ngIf="header.searchField == 'box'" class="box-search">
+            <div class="box-search-icon">
+              <button mat-icon-button (click)="emitChange()">
+                <mat-icon class="mat-24" aria-label="Search icon">search</mat-icon>
+              </button>
+            </div>
+            <div class="box-search-input-wrapper">
+              <input type="text" #globalFilterField placeholder="Search...">
+            </div>
+          </div>
         </div>
 
         <button mat-icon-button *ngIf="header.colSetting" class="col-setting-btn" (click)="openColSetting()">
@@ -110,18 +123,18 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
       display: flex;
     }
     .table-header-title{
-      width: 40%;
+      width: 50%;
       line-height: 64px;
       font-size: 22px;
     }
     .table-header-selection-count{
-      width: 40%;
+      width: 50%;
       line-height: 64px;
     }
     .tool-box{
       display: flex;
       justify-content: flex-end;
-      width: 60%;
+      width: 50%;
       right: 0px;
       color: #757575;
     }
@@ -159,12 +172,44 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
     .search-close{
       width: 0%;
     }
+    .box-search{
+      background-color: #fff;
+      height: 44px;
+      position: inherit;
+      top: 10px;
+      vertical-align: top;
+      border-radius: 2px;
+      box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+      transition: box-shadow 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    .box-search-icon{
+      float: right;
+    }
+    .box-search-icon button{
+      margin-top: 2px;
+    }
+    .box-search-input-wrapper{
+      overflow: hidden;
+      height: auto;
+      padding: 5px 12px;
+    }
+    .box-search input{
+      border: none;
+      padding: 0px;
+      margin: 0px;
+      height: 34px;
+      line-height: 34px;
+      width: 100%;
+      z-index: 6;
+      outline: none;
+      font-size: 16px;
+    }
   `]
 })
 export class HeaderComponent implements AfterViewInit, OnDestroy{
   @Input('mHeader') header: Header;
 
-  @Output() filterChange: EventEmitter<string> = new EventEmitter();
+  @Output() filterChange: EventEmitter<any> = new EventEmitter();
 
   @ViewChild('globalFilterField') globalFilterField: ElementRef;
 
@@ -182,15 +227,19 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
   ngAfterViewInit(){
     if(this.globalFilterField){
       this.globalFilterFunction = this.renderer.listen(this.globalFilterField.nativeElement, 'keyup', () => {
-        this.filterChange.emit(this.globalFilterField.nativeElement.value);
+        this.filterChange.emit({value: this.globalFilterField.nativeElement.value, type: 'input'});
       });
     }
+  }
+
+  emitChange(){
+    this.filterChange.emit({value: this.globalFilterField.nativeElement.value, type: 'click'});
   }
 
   toggleSearch(state: boolean){
     if(!state){
       this.globalFilterField.nativeElement.value = '';
-      this.filterChange.emit('');
+      this.filterChange.emit({value: '', type: 'input'});
     }else {
       this.globalFilterField.nativeElement.focus();
     }

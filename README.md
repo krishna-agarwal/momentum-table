@@ -2,7 +2,7 @@
 
 MomentumTable is material based rich DataTable component for Angular. It is based on [material DataTable guidline](https://material.io/guidelines/components/data-tables.html#data-tables-structure).
 
-[Demo](https://momentum-table-demo.stackblitz.io/)
+[Demo](https://stackblitz.com/edit/momentum-table-demo)
 ## Features
 * Searching
 * Sorting
@@ -86,7 +86,7 @@ For all features please follow [documentation](https://github.com/krishna-agarwa
 
 
 ## Documentation and Demo
-[Demo](https://momentum-table-demo.stackblitz.io/)
+[Demo](https://stackblitz.com/edit/momentum-table-demo)
 
 [documentation](https://github.com/krishna-agarwal/momentum-table/wiki/Documentation)
 

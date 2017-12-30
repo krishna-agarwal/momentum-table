@@ -45,7 +45,6 @@ import {MomentumTemplate} from './template.directive';
     .table-container{
       overflow: auto;
       background: #fff;
-      font-family: Roboto, 'Helvetica Neue', sans-serif;
       color: rgba(0, 0, 0, 0.87);
     }
     table {

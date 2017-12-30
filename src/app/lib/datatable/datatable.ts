@@ -40,15 +40,12 @@ import {MomentumTemplate} from './template.directive';
   `,
   styles: [`
     .card-wrapper{
-      padding: 0px !important;
+      padding: 0;
     }
     .table-container{
-      width: 100%;
-      overflow: scroll;
+      overflow: auto;
       background: #fff;
-      display: inline-block !important;
-      font-family: Roboto,Helvetica Neue,sans-serif !important;
-      font-size: 14px;
+      font-family: Roboto, 'Helvetica Neue', sans-serif;
       color: rgba(0, 0, 0, 0.87);
     }
     table {

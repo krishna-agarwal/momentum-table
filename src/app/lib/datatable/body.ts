@@ -101,7 +101,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
         <td *ngIf="dt.selectionHandler == true">
           <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
         </td>
-        <td #cell [hidden]="col.hidden" *ngFor="let col of columns" [ngClass]="{'m-editable-column':col.editable, 'm-clickable':col.editable}" (click)="dt.switchCellToEditMode(cell,col,row)">
+        <td #cell [hidden]="col.hidden" *ngFor="let col of columns" [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', col.editable ? 'm-clickable' : '']" (click)="dt.switchCellToEditMode(cell,col,row)">
           <span class="m-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'m-clickable':col.editable}">{{row[col.field]}}</span>
           <span class="m-cell-data" *ngIf="col.bodyTemplate">
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
@@ -117,7 +117,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
             <m-columnEditorTemplateLoader *ngIf="col.editorTemplate" (click)="$event.stopPropagation()" [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnEditorTemplateLoader>
           </div>
         </td>
-        <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
+        <td *ngIf="dt.expandable == true">
           <span class="m-expand-icon material-icons" (click)="dt.toggleRow(row, $event)">
             <i class="material-icons m-clickable" *ngIf="!dt.isRowExpanded(row)">keyboard_arrow_right</i>
             <i class="material-icons m-clickable" *ngIf="dt.isRowExpanded(row)">keyboard_arrow_down</i>
@@ -143,20 +143,20 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
     }
     tr {
       border-top: 1px solid #e0e0e0;
-      height: 47px;
+      height: var(--row-height, 47px);
       transition: all 0.2s;
     }
     tr:hover{
       background: #EEEEEE;
     }
     td:not(:first-child){
-      padding: 0px 28px;
+      padding: var(--column-padding, 0px 28px)
     }
     td:first-child{
-      padding-left: 24px;
+      padding: var(--first-column-padding, 0 0 0 24px)
     }
     td:last-child{
-      padding-right: 24px;
+      padding: var(--last-column-padding, 0 24px 0 0)
     }
     .m-row-selected{
       background: #EEEEEE;

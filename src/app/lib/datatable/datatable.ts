@@ -44,6 +44,7 @@ import {MomentumTemplate} from './template.directive';
     }
     .table-container{
       overflow: auto;
+      height: var(--table-height);
       background: #fff;
       font-size: 14px;
       color: rgba(0, 0, 0, 0.87);

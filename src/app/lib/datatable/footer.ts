@@ -52,21 +52,21 @@ export class GlobalFooterTemplateLoader implements OnInit, OnChanges, OnDestroy 
 @Component({
   selector: '[mFooter]',
   template: `
-    <div *ngIf="footer.template" class="table-footer">
+    <div *ngIf="footer.template" class="card-footer">
       <m-globalFooterTemplateLoader [footer]="footer"></m-globalFooterTemplateLoader>
     </div>
 
-    <div *ngIf="!footer.template" class="table-footer">
+    <div *ngIf="!footer.template" class="card-footer">
       <div *ngIf="footer.paginator">
         <mat-paginator (page)="dt.pageChange($event)" [length]="(footer.length != undefined) ? footer.length : dt.totalRecords" [pageIndex]="(footer.pageIndex != undefined) ? footer.pageIndex : dt.pageIndex" [pageSize]="footer.pageSize" [pageSizeOptions]="footer.pageSizeOptions"></mat-paginator>
       </div>
     </div>
   `,
   styles: [`
-    .table-footer{
-      height: 56px;
+    .card-footer{
+      height: var(--card-footer-height, 56px);
+      padding: var(--card-footer-padding, 0 14px 0 24px);
       border-top: 1px solid #e0e0e0;
-      padding-left: 24px;
     }
   `]
 })

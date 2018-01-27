@@ -1,3 +1,20 @@
-:host ::ng-deep .country-class{
+:host ::ng-deep .country-header-class{
   min-width: 200px !important;
+}
+
+:host ::ng-deep .align-right{
+  text-align: right;
+}
+
+:host{
+  --column-padding: 0 28px;
+  --first-column-padding: 0 0 0 24px;
+  --last-column-padding: 0 24px 0 0;
+
+  --row-height: 47px;
+  --table-header-height: 55px;
+  --table-footer-height: 51px;
+
+  --card-footer-height: 64px;
+  --card-footer-height: 56px;
 }

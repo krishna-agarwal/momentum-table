@@ -39,7 +39,7 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
           <m-columnFooterTemplateLoader [column]="col"></m-columnFooterTemplateLoader>
         </span>
       </td>
-      <td *ngIf="dt.expandable == true" style="padding-left: 0px;">
+      <td *ngIf="dt.expandable == true">
       </td>
     </tr>
   `,
@@ -50,7 +50,7 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
     tr {
       text-align: left;
       font-size: 12px;
-      height: 51px;
+      height: var(--table-footer-height, 51px);
       color: rgba(0, 0, 0, 0.54);
       border-top: 1px solid #e0e0e0;
     }
@@ -58,13 +58,13 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
       background: #fff;
     }
     td:not(:first-child){
-      padding: 0px 28px;
+      padding: var(--column-padding, 0px 28px)
     }
     td:first-child{
-      padding-left: 24px;
+      padding: var(--first-column-padding, 0 0 0 24px)
     }
     td:last-child{
-      padding-right: 24px;
+      padding: var(--last-column-padding, 0 24px 0 0)
     }
   `]
 })

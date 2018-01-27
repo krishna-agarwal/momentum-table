@@ -59,13 +59,13 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
 @Component({
   selector: '[mHeader]',
   template: `
-    <div *ngIf="header.template" class="table-header">
+    <div *ngIf="header.template" class="card-header">
       <m-globalHeaderTemplateLoader [header]="header"></m-globalHeaderTemplateLoader>
     </div>
 
-    <div *ngIf="!header.template" class="table-header">
-      <div *ngIf="header.title && !dt.itemsSelected()" class="table-header-title">{{header.title}}</div>
-      <div *ngIf="dt.itemsSelected()" class="table-header-selection-count">{{dt.itemsSelected()}} item(s) selected</div>
+    <div *ngIf="!header.template" class="card-header">
+      <div *ngIf="header.title && !dt.itemsSelected()" class="card-header-title">{{header.title}}</div>
+      <div *ngIf="dt.itemsSelected()" class="card-header-selection-count">{{dt.itemsSelected()}} item(s) selected</div>
       <div class="tool-box">
         <div class="search-setting-wrapper" *ngIf="header.globalSearch">
           <div *ngIf="header.searchField == 'line'" class="line-search">
@@ -114,20 +114,19 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
     </div>
   `,
   styles: [`
-    .table-header{
-      height: 64px;
+    .card-header{
+      height: var(--card-header-height, 64px);
+      padding: var(--card-header-padding, 0 14px 0 24px);
       border-bottom: 1px solid #e0e0e0;
-      padding-left: 24px;
-      padding-right: 14px;
       position: relative;
       display: flex;
     }
-    .table-header-title{
+    .card-header-title{
       width: 50%;
       line-height: 64px;
       font-size: 22px;
     }
-    .table-header-selection-count{
+    .card-header-selection-count{
       width: 50%;
       line-height: 64px;
     }

@@ -43,6 +43,7 @@ export class ColumnComponent implements AfterContentInit{
   @Input() footer: string;
   @Input() sortable: boolean;
   @Input() editable: boolean;
+  @Input() editTrigger: string = 'cell';
   @Input() hidden: boolean;
   @Input() frozen: boolean;
   @Input() colHeadClass: any;

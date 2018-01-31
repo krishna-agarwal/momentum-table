@@ -18,13 +18,13 @@
   </m-header>
   <m-footer [paginator]="true" [pageSize]="5"></m-footer>
 
-  <m-column field="country" header="Country" [sortable]="true" [editable]="true" [colHeadClass]="'country-header-class'"></m-column>
+  <m-column field="country" header="Country" [sortable]="true" [editable]="true" [editTrigger]="'button'" [colHeadClass]="'country-header-class'"></m-column>
 
-  <m-column field="population" header="Population" [sortable]="true" [colHeadClass]="'align-right'" [colBodyClass]="'align-right'"></m-column>
+  <m-column field="population" header="Population" [sortable]="true" [editable]="true" [colHeadClass]="'align-right'" [colBodyClass]="'align-right'"></m-column>
 
   <m-column field="capital" header="Capital" [sortable]="true"></m-column>
 
-  <m-column field="continent" header="Continent"></m-column>
+  <m-column field="continent" header="Continent" [sortable]="true"></m-column>
 
   <m-column field="flag" header="flag" [sortable]="true" [editable]="true">
     <ng-template let-col mTemplate="header">

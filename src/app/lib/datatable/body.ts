@@ -101,7 +101,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
         <td *ngIf="dt.selectionHandler == true">
           <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
         </td>
-        <td #cell [hidden]="col.hidden" *ngFor="let col of columns" [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', col.editable ? 'm-clickable' : '']" (click)="dt.switchCellToEditMode(cell,col,row)">
+        <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index;" [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row)">
           <span class="m-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'m-clickable':col.editable}">{{row[col.field]}}</span>
           <span class="m-cell-data" *ngIf="col.bodyTemplate">
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
@@ -116,6 +116,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
             </mat-card>
             <m-columnEditorTemplateLoader *ngIf="col.editorTemplate" (click)="$event.stopPropagation()" [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnEditorTemplateLoader>
           </div>
+          <span [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'" class="material-icons edit-icon m-clickable" (click)="dt.switchCellToEditMode(cell,col,row);">mode_edit</span>
         </td>
         <td *ngIf="dt.expandable == true">
           <span class="m-expand-icon material-icons" (click)="dt.toggleRow(row, $event)">
@@ -190,10 +191,21 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
     .m-editable-column.m-cell-editing > .m-cell-data {
       visibility: hidden;
     }
+    .edit-icon{
+      font-size: initial;
+      color: #757575;
+      cursor: pointer;
+    }
   `]
 })
 export class TableBodyComponent {
   constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
   @Input('mTableBody') columns: ColumnComponent[];
   @Input() value;
+  hoverRowIndex;
+  hoverCellIndex;
+  onHover(ri, ci, hover) {
+    this.hoverRowIndex = hover ? ri : undefined;
+    this.hoverCellIndex = hover ? ci : undefined;
+  }
 }

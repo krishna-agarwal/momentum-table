@@ -146,6 +146,10 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   public documentEditListener: Function;
 
+  public editRowIndex: number;
+
+  public editCellIndex: number;
+
   _sortField: string;
 
   _sortOrder: number = 1;
@@ -580,7 +584,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     }
   }
 
-  switchCellToEditMode(cell: any, column: ColumnComponent, rowData: any) {
+  switchCellToEditMode(cell: any, column: ColumnComponent, rowData: any, ri, ci) {
     if(column.editable && !this.editorClick){
       this.editorClick = true;
       this.bindDocumentEditListener();
@@ -597,6 +601,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
         if(focusable) {
           setTimeout(() => this.domHandler.invokeElementMethod(focusable, 'focus'), 50);
         }
+        this.editRowIndex = ri;
+        this.editCellIndex = ci;
       }
 
     }
@@ -613,6 +619,8 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     if(this.editingCell) {
       this.domHandler.removeClass(this.editingCell, 'm-cell-editing');
       this.editingCell = null;
+      this.editRowIndex = null;
+      this.editCellIndex = null;
       this.unbindDocumentEditListener();
     }
   }
@@ -737,7 +745,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
 
   public exportCSV(csvSeparator: string, exportFilename: string, selectionOnly: boolean) {
-    let data = this.filteredValue||this.value;
+    let data = this.filteredValue || this.value;
     let csv = '\ufeff';
 
     if(selectionOnly) {
@@ -754,7 +762,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       }
     }
 
-    //headers
+    // headers
     for(let i = 0; i < this.columns.length; i++) {
       if(this.columns[i].field) {
         csv += '"' + (this.columns[i].header || this.columns[i].field) + '"';
@@ -765,7 +773,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
       }
     }
 
-    //body
+    // body
     data.forEach((record, i) => {
       csv += '\n';
       for(let i = 0; i < this.columns.length; i++) {

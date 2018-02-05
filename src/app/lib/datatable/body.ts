@@ -101,12 +101,12 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
         <td *ngIf="dt.selectionHandler == true">
           <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
         </td>
-        <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index;" [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row)">
+        <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index;" [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
           <span class="m-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'m-clickable':col.editable}">{{row[col.field]}}</span>
           <span class="m-cell-data" *ngIf="col.bodyTemplate">
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
           </span>
-          <div class="m-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable">
+          <div class="m-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable && rowIndex === dt.editRowIndex && colIndex === dt.editCellIndex">
             <mat-card matInput class="m-input-card" *ngIf="!col.editorTemplate">
               <mat-form-field [floatPlaceholder]="'never'" class="m-input-form">
                 <input matInput placeholder="{{col.header}}" [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)"
@@ -116,7 +116,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
             </mat-card>
             <m-columnEditorTemplateLoader *ngIf="col.editorTemplate" (click)="$event.stopPropagation()" [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnEditorTemplateLoader>
           </div>
-          <span [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'" class="material-icons edit-icon m-clickable" (click)="dt.switchCellToEditMode(cell,col,row);">mode_edit</span>
+          <span [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'" class="material-icons edit-icon m-clickable" (click)="dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex);">mode_edit</span>
         </td>
         <td *ngIf="dt.expandable == true">
           <span class="m-expand-icon material-icons" (click)="dt.toggleRow(row, $event)">

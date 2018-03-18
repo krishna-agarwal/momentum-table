@@ -1,13 +1,22 @@
 import {
-  Component, ContentChild, EmbeddedViewRef, forwardRef, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges,
+  Component,
+  ContentChild,
+  EmbeddedViewRef,
+  forwardRef,
+  Inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
   TemplateRef,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
-import {DataTable} from './datatable';
+import { DataTable } from './datatable';
 
 @Component({
   selector: 'm-footer',
-  template: ``
+  template: ``,
 })
 export class Footer {
   @Input() paginator: boolean = false;
@@ -17,15 +26,15 @@ export class Footer {
   @Input() pageIndex: number;
   @ContentChild(TemplateRef) template: TemplateRef<any>;
 
-  constructor() { }
+  constructor() {}
 }
 
 @Component({
   selector: 'm-globalFooterTemplateLoader',
-  template: ``
+  template: ``,
 })
-export class GlobalFooterTemplateLoader implements OnInit, OnChanges, OnDestroy {
-
+export class GlobalFooterTemplateLoader
+  implements OnInit, OnChanges, OnDestroy {
   @Input() footer: any;
 
   view: EmbeddedViewRef<any>;
@@ -34,12 +43,12 @@ export class GlobalFooterTemplateLoader implements OnInit, OnChanges, OnDestroy 
 
   ngOnInit() {
     this.view = this.viewContainer.createEmbeddedView(this.footer.template, {
-      '\$implicit': this.footer
+      $implicit: this.footer,
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if(!this.view) {
+    if (!this.view) {
       return;
     }
   }
@@ -62,15 +71,20 @@ export class GlobalFooterTemplateLoader implements OnInit, OnChanges, OnDestroy 
       </div>
     </div>
   `,
-  styles: [`
+  styles: [
+    `
     .card-footer{
       height: var(--card-footer-height, 56px);
       padding: var(--card-footer-padding, 0 14px 0 24px);
       border-top: 1px solid #e0e0e0;
     }
-  `]
+  `,
+  ],
 })
 export class FooterComponent {
   @Input('mFooter') footer: Footer;
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
+  constructor(
+    @Inject(forwardRef(() => DataTable))
+    public dt: DataTable,
+  ) {}
 }

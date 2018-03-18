@@ -1,15 +1,20 @@
 import {
-  Component, EmbeddedViewRef, forwardRef, Inject, Input, OnDestroy, OnInit,
-  ViewContainerRef
+  Component,
+  EmbeddedViewRef,
+  forwardRef,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewContainerRef,
 } from '@angular/core';
-import {DataTable} from './datatable';
-import {ColumnComponent} from './columns';
+import { DataTable } from './datatable';
+import { ColumnComponent } from './columns';
 @Component({
   selector: 'm-columnFooterTemplateLoader',
-  template: ``
+  template: ``,
 })
 export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
-
   @Input() column: any;
 
   view: EmbeddedViewRef<any>;
@@ -17,9 +22,12 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
   constructor(public viewContainer: ViewContainerRef) {}
 
   ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.footerTemplate, {
-      '\$implicit': this.column
-    });
+    this.view = this.viewContainer.createEmbeddedView(
+      this.column.footerTemplate,
+      {
+        $implicit: this.column,
+      },
+    );
   }
 
   ngOnDestroy() {
@@ -43,7 +51,8 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
       </td>
     </tr>
   `,
-  styles: [`
+  styles: [
+    `
     td{
       position: relative;
     }
@@ -66,9 +75,13 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
     td:last-child{
       padding: var(--last-column-padding, 0 24px 0 0)
     }
-  `]
+  `,
+  ],
 })
 export class ColumnFooterComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
+  constructor(
+    @Inject(forwardRef(() => DataTable))
+    public dt: DataTable,
+  ) {}
   @Input('mColumnFooter') columns: ColumnComponent[];
 }

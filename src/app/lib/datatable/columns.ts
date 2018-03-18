@@ -1,15 +1,22 @@
 import {
-  AfterContentInit, Component, ContentChildren, EmbeddedViewRef, Input, OnDestroy, OnInit, QueryList,
-  TemplateRef, ViewContainerRef
+  AfterContentInit,
+  Component,
+  ContentChildren,
+  EmbeddedViewRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  TemplateRef,
+  ViewContainerRef,
 } from '@angular/core';
-import {MomentumTemplate} from "./template.directive";
+import { MomentumTemplate } from './template.directive';
 
 @Component({
   selector: 'm-columnEditorTemplateLoader',
-  template: ``
+  template: ``,
 })
 export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
-
   @Input() column: any;
 
   @Input() row: any;
@@ -21,11 +28,14 @@ export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
   constructor(public viewContainer: ViewContainerRef) {}
 
   ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.editorTemplate, {
-      '\$implicit': this.column,
-      'row': this.row,
-      'rowIndex': this.rowIndex
-    });
+    this.view = this.viewContainer.createEmbeddedView(
+      this.column.editorTemplate,
+      {
+        $implicit: this.column,
+        row: this.row,
+        rowIndex: this.rowIndex,
+      },
+    );
   }
 
   ngOnDestroy() {
@@ -35,9 +45,9 @@ export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
 
 @Component({
   selector: 'm-column',
-  template: ``
+  template: ``,
 })
-export class ColumnComponent implements AfterContentInit{
+export class ColumnComponent implements AfterContentInit {
   @Input() field: string;
   @Input() header: string;
   @Input() footer: string;
@@ -56,12 +66,11 @@ export class ColumnComponent implements AfterContentInit{
   public footerTemplate: TemplateRef<any>;
   public editorTemplate: TemplateRef<any>;
 
-  constructor() {
-  }
+  constructor() {}
 
-  ngAfterContentInit(){
-    this.templates.forEach((item) => {
-      switch(item.getType()){
+  ngAfterContentInit() {
+    this.templates.forEach(item => {
+      switch (item.getType()) {
         case 'header':
           this.headerTemplate = item.template;
           break;
@@ -82,6 +91,6 @@ export class ColumnComponent implements AfterContentInit{
           this.bodyTemplate = item.template;
           break;
       }
-    })
+    });
   }
 }

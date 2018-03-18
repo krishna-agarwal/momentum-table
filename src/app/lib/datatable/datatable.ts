@@ -1,27 +1,46 @@
 import {
   AfterContentChecked,
-  AfterContentInit, AfterViewInit, Component, ContentChild, ContentChildren, Directive, DoCheck,
+  AfterContentInit,
+  AfterViewInit,
+  Component,
+  ContentChild,
+  ContentChildren,
+  Directive,
+  DoCheck,
   EventEmitter,
-  Input, IterableDiffers,
-  NgModule, OnDestroy, OnInit,
+  Input,
+  IterableDiffers,
+  NgModule,
+  OnDestroy,
+  OnInit,
   Output,
-  QueryList, Renderer2, TemplateRef
+  QueryList,
+  Renderer2,
+  TemplateRef,
 } from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {MaterialModule} from '../material';
-import {DomHandler} from '../services/domhandler.service';
-import {ObjectUtils} from '../services/util.service';
-import {FormsModule} from '@angular/forms';
-import {ColumnComponent, ColumnEditorTemplateLoader} from './columns';
-import {ColumnBodyTemplateLoader, EmptyTableLoader, RowExpansionLoader, TableBodyComponent} from './body';
-import {GlobalHeaderTemplateLoader, Header, HeaderComponent} from './header';
-import {Footer, FooterComponent, GlobalFooterTemplateLoader} from './footer';
-import {ColumnHeaderComponent, ColumnHeaderTemplateLoader} from './column-header';
-import {ColumnFooterComponent, ColumnFooterTemplateLoader} from './column-footer';
-import {MomentumTemplate} from './template.directive';
-
-
-
+import { CommonModule } from '@angular/common';
+import { MaterialModule } from '../material';
+import { DomHandler } from '../services/domhandler.service';
+import { ObjectUtils } from '../services/util.service';
+import { FormsModule } from '@angular/forms';
+import { ColumnComponent, ColumnEditorTemplateLoader } from './columns';
+import {
+  ColumnBodyTemplateLoader,
+  EmptyTableLoader,
+  RowExpansionLoader,
+  TableBodyComponent,
+} from './body';
+import { GlobalHeaderTemplateLoader, Header, HeaderComponent } from './header';
+import { Footer, FooterComponent, GlobalFooterTemplateLoader } from './footer';
+import {
+  ColumnHeaderComponent,
+  ColumnHeaderTemplateLoader,
+} from './column-header';
+import {
+  ColumnFooterComponent,
+  ColumnFooterTemplateLoader,
+} from './column-footer';
+import { MomentumTemplate } from './template.directive';
 
 @Component({
   selector: 'm-table',
@@ -38,7 +57,8 @@ import {MomentumTemplate} from './template.directive';
       <div *ngIf="footer" [mFooter]="footer"></div>
     </mat-card>
   `,
-  styles: [`
+  styles: [
+    `
     .card-wrapper{
       padding: 0;
     }
@@ -55,11 +75,18 @@ import {MomentumTemplate} from './template.directive';
       border-spacing: 0;
       position: relative;
     }
-  `],
-  providers: [DomHandler, ObjectUtils]
+  `,
+  ],
+  providers: [DomHandler, ObjectUtils],
 })
-export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, DoCheck, AfterContentChecked {
-
+export class DataTable
+  implements
+    OnInit,
+    AfterContentInit,
+    AfterViewInit,
+    OnDestroy,
+    DoCheck,
+    AfterContentChecked {
   @Input() width: string = '100%';
 
   @Input() height: string = 'auto';
@@ -164,18 +191,22 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   differ: any;
 
-  constructor(public domHandler: DomHandler, public objectUtils: ObjectUtils, public renderer: Renderer2, public differs: IterableDiffers) {
+  constructor(
+    public domHandler: DomHandler,
+    public objectUtils: ObjectUtils,
+    public renderer: Renderer2,
+    public differs: IterableDiffers,
+  ) {
     this.differ = differs.find([]).create(null);
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngAfterContentInit() {
     this.initColumns();
 
-    this.templates.forEach((item) => {
-      switch(item.getType()) {
+    this.templates.forEach(item => {
+      switch (item.getType()) {
         case 'expansion':
           this.expansionTemplate = item.template;
           break;
@@ -186,11 +217,9 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     });
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit() {}
 
-  }
-
-  filterChange(event: any){
+  filterChange(event: any) {
     this.globalFilterString = event.value;
     if (this.filterTimeout) {
       clearTimeout(this.filterTimeout);
@@ -201,108 +230,117 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     }, 300);
   }
 
-  @Input() get value(): any[] {
+  @Input()
+  get value(): any[] {
     return this._value;
   }
 
-  set value(val:any[]) {
+  set value(val: any[]) {
     this._value = val;
 
     this.valueChange.emit(this.value);
   }
 
-  @Input() get sortField(): string{
+  @Input()
+  get sortField(): string {
     return this._sortField;
   }
 
-  set sortField(val: string){
+  set sortField(val: string) {
     this._sortField = val;
-    if(this.sortLocal)
-      this.sortSingle();
+    if (this.sortLocal) this.sortSingle();
   }
 
-  @Input() get sortOrder(): number {
+  @Input()
+  get sortOrder(): number {
     return this._sortOrder;
   }
   set sortOrder(val: number) {
     this._sortOrder = val;
-    if(this.sortLocal)
-      this.sortSingle();
+    if (this.sortLocal) this.sortSingle();
   }
 
-  @Input() get selection(): any{
+  @Input()
+  get selection(): any {
     return this._selection;
   }
 
-  set selection(val: any){
+  set selection(val: any) {
     this._selection = val;
   }
 
-  initColumns(): void{
+  initColumns(): void {
     this.columns = this.cols.toArray();
-  };
-
-  ngDoCheck() {
-
   }
+
+  ngDoCheck() {}
 
   ngAfterContentChecked() {
     let changes = this.differ.diff(this.value);
-    if(changes) {
+    if (changes) {
       this.handleDataChange();
     }
   }
 
   handleDataChange() {
-    if(this.hasFilter()) {
+    if (this.hasFilter()) {
       this._filter();
     }
 
-    if(this.sortField) {
-      if(!this.sortColumn && this.columns) {
-        this.sortColumn = this.columns.find(col => col.field === this.sortField);
+    if (this.sortField) {
+      if (!this.sortColumn && this.columns) {
+        this.sortColumn = this.columns.find(
+          col => col.field === this.sortField,
+        );
       }
-      if(this.sortLocal)
-        this.sortSingle();
+      if (this.sortLocal) this.sortSingle();
     }
 
     this.updateDataToRender(this.filteredValue || this.value);
   }
 
-  pageChange(pageData){
+  pageChange(pageData) {
     this.footer.pageSize = pageData.pageSize;
-    this.updateDataToRender(this.filteredValue || this.value, pageData.pageIndex, pageData.pageSize);
+    this.updateDataToRender(
+      this.filteredValue || this.value,
+      pageData.pageIndex,
+      pageData.pageSize,
+    );
     this.onPage.emit(pageData);
   }
 
-  updateDataToRender(dataSource, pageIndex: number = 0, pageSize: number = this.footer ? this.footer.pageSize : 0) {
+  updateDataToRender(
+    dataSource,
+    pageIndex: number = 0,
+    pageSize: number = this.footer ? this.footer.pageSize : 0,
+  ) {
     this.totalRecords = dataSource.length;
     this.pageIndex = pageIndex;
 
-    if(this.footer && this.footer.paginator){
+    if (this.footer && this.footer.paginator) {
       this.dataToRender = [];
       const startIndex: number = pageIndex * pageSize;
       const endIndex: number = startIndex + pageSize;
 
-      for(let i = startIndex; i < endIndex; i++) {
-        if(i >= dataSource.length) {
+      for (let i = startIndex; i < endIndex; i++) {
+        if (i >= dataSource.length) {
           break;
         }
         this.dataToRender.push(dataSource[i]);
       }
-    }else{
+    } else {
       this.dataToRender = dataSource;
     }
   }
 
   resolveFieldData(data: any, field: string): any {
-    if(data && field) {
-      if(field.indexOf('.') === -1) {
+    if (data && field) {
+      if (field.indexOf('.') === -1) {
         return data[field];
-      }else {
+      } else {
         let fields: string[] = field.split('.');
         let value = data;
-        for(let i = 0, len = fields.length; i < len; ++i) {
+        for (let i = 0, len = fields.length; i < len; ++i) {
           if (value == null) {
             return null;
           }
@@ -310,79 +348,84 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
         }
         return value;
       }
-    }
-    else {
+    } else {
       return null;
     }
   }
 
   visibleColumns() {
-    return this.columns ? this.columns.filter(c => !c.hidden): [];
+    return this.columns ? this.columns.filter(c => !c.hidden) : [];
   }
 
   totalColumns() {
-    return this.visibleColumns().length + (this.expandable ? 1: 0) + (this.selectionHandler ? 1 : 0);
+    return (
+      this.visibleColumns().length +
+      (this.expandable ? 1 : 0) +
+      (this.selectionHandler ? 1 : 0)
+    );
   }
 
   hasFooter() {
-    if(this.columns) {
-      for(let i = 0; i  < this.columns.length; i++) {
-        if(this.columns[i].footer || this.columns[i].footerTemplate) {
+    if (this.columns) {
+      for (let i = 0; i < this.columns.length; i++) {
+        if (this.columns[i].footer || this.columns[i].footerTemplate) {
           return true;
         }
       }
     }
     return false;
-  };
+  }
 
   isEmpty() {
-    return !this.dataToRender||(this.dataToRender.length == 0);
+    return !this.dataToRender || this.dataToRender.length == 0;
   }
 
   sort(event, column: ColumnComponent) {
-    if(!column.sortable) {
+    if (!column.sortable) {
       return;
     }
     const targetNode = event.target.nodeName;
-    if(targetNode === 'TH' && this.domHandler.hasClass(event.target, 'm-sortable-column') || ((targetNode === 'SPAN' || targetNode === 'DIV') && !this.domHandler.hasClass(event.target, 'm-clickable'))){
+    if (
+      (targetNode === 'TH' &&
+        this.domHandler.hasClass(event.target, 'm-sortable-column')) ||
+      ((targetNode === 'SPAN' || targetNode === 'DIV') &&
+        !this.domHandler.hasClass(event.target, 'm-clickable'))
+    ) {
       this.sortColumn = column;
       // todo sort logic
 
       const columnSortField = column.field;
-      this._sortOrder = (this.sortField === columnSortField)  ? this.sortOrder * -1 : this.defaultSortOrder;
+      this._sortOrder =
+        this.sortField === columnSortField
+          ? this.sortOrder * -1
+          : this.defaultSortOrder;
       this._sortField = columnSortField;
       this.sortColumn = column;
 
-      if(this.sortLocal)
-        this.sortSingle();
+      if (this.sortLocal) this.sortSingle();
 
       this.onSort.emit({
         field: this.sortField,
-        order: this.sortOrder
+        order: this.sortOrder,
       });
-
     }
-  };
+  }
 
-  sortSingle(){
-    if(this.value){
+  sortSingle() {
+    if (this.value) {
       this.value.sort((data1, data2) => {
         let value1 = this.resolveFieldData(data1, this.sortField);
         let value2 = this.resolveFieldData(data2, this.sortField);
         let result = null;
 
-        if (value1 == null && value2 != null)
-          result = -1;
-        else if (value1 != null && value2 == null)
-          result = 1;
-        else if (value1 == null && value2 == null)
-          result = 0;
+        if (value1 == null && value2 != null) result = -1;
+        else if (value1 != null && value2 == null) result = 1;
+        else if (value1 == null && value2 == null) result = 0;
         else if (typeof value1 === 'string' && typeof value2 === 'string')
           result = value1.localeCompare(value2);
-        else
-          result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
+        else result = value1 < value2 ? -1 : value1 > value2 ? 1 : 0;
 
-        return (this.sortOrder * result);
+        return this.sortOrder * result;
       });
     }
   }
@@ -390,56 +433,74 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   getSortOrder(column: ColumnComponent) {
     let order = 0;
     const columnSortField = column.field;
-    if(this.sortField && columnSortField === this.sortField) {
+    if (this.sortField && columnSortField === this.sortField) {
       order = this.sortOrder;
     }
     return order;
   }
 
   handleRowClick(event: MouseEvent, rowData: any, index: number) {
+    const targetNode = (<HTMLElement>event.target).nodeName;
 
-    const targetNode = (<HTMLElement> event.target).nodeName;
-
-    if(targetNode === 'INPUT' || targetNode === 'BUTTON' || targetNode === 'A' || (this.domHandler.hasClass(event.target, 'm-clickable'))) {
+    if (
+      targetNode === 'INPUT' ||
+      targetNode === 'BUTTON' ||
+      targetNode === 'A' ||
+      this.domHandler.hasClass(event.target, 'm-clickable')
+    ) {
       return;
     }
 
-    this.onRowClick.emit({originalEvent: event, data: rowData});
+    this.onRowClick.emit({ originalEvent: event, data: rowData });
 
-    if(this.selectionHandler === true)
-      return;
+    if (this.selectionHandler === true) return;
 
-    if(this.selectable) {
+    if (this.selectable) {
       const selected = this.isSelected(rowData);
-      if(this.selectionMode === 'single'){
-        if(selected) {
+      if (this.selectionMode === 'single') {
+        if (selected) {
           this._selection = [];
-          this.onRowUnselect.emit({originalEvent: event, data: rowData, type: 'row'});
-        }else{
+          this.onRowUnselect.emit({
+            originalEvent: event,
+            data: rowData,
+            type: 'row',
+          });
+        } else {
           this._selection = [rowData];
-          this.onRowSelect.emit({originalEvent: event, data: rowData, type: 'row'});
+          this.onRowSelect.emit({
+            originalEvent: event,
+            data: rowData,
+            type: 'row',
+          });
         }
-      }else if(this.selectionMode === 'multiple'){
-        if(selected) {
+      } else if (this.selectionMode === 'multiple') {
+        if (selected) {
           const selectionIndex = this.findIndexInSelection(rowData);
-          this._selection = this.selection.filter((val, i) => i !== selectionIndex);
-          this.onRowUnselect.emit({originalEvent: event, data: rowData, type: 'row'});
-        }else {
-          this._selection = [...this.selection || [], rowData];
-          this.onRowSelect.emit({originalEvent: event, data: rowData, type: 'row'});
+          this._selection = this.selection.filter(
+            (val, i) => i !== selectionIndex,
+          );
+          this.onRowUnselect.emit({
+            originalEvent: event,
+            data: rowData,
+            type: 'row',
+          });
+        } else {
+          this._selection = [...(this.selection || []), rowData];
+          this.onRowSelect.emit({
+            originalEvent: event,
+            data: rowData,
+            type: 'row',
+          });
         }
       }
 
       this.selectionChange.emit(this.selection);
     }
-
   }
 
   toggleRowsWithCheckbox(event) {
-    if(event.checked)
-      this.selection = this.value.slice();
-    else
-      this.selection = [];
+    if (event.checked) this.selection = this.value.slice();
+    else this.selection = [];
 
     this.selectionChange.emit(this.selection);
 
@@ -451,24 +512,42 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
 
   toggleRowWithCheckbox(event, rowData: any) {
-    if(this.selectionMode === 'single'){
-      if(!this.objectUtils.equalsByValue(this.selection, [rowData])){
+    if (this.selectionMode === 'single') {
+      if (!this.objectUtils.equalsByValue(this.selection, [rowData])) {
         this._selection = [rowData];
-        this.onRowSelect.emit({originalEvent: event, data: rowData, type: 'checkbox'});
-      }else {
+        this.onRowSelect.emit({
+          originalEvent: event,
+          data: rowData,
+          type: 'checkbox',
+        });
+      } else {
         this._selection = [];
-        this.onRowUnselect.emit({originalEvent: event, data: rowData, type: 'checkbox'});
+        this.onRowUnselect.emit({
+          originalEvent: event,
+          data: rowData,
+          type: 'checkbox',
+        });
       }
-    }else if(this.selectionMode === 'multiple'){
+    } else if (this.selectionMode === 'multiple') {
       const selectionIndex = this.findIndexInSelection(rowData);
       this.selection = this.selection || [];
 
-      if(selectionIndex !== -1) {
-        this._selection = this.selection.filter((val, i) => i !== selectionIndex);
-        this.onRowUnselect.emit({originalEvent: event, data: rowData, type: 'checkbox'});
-      }else {
+      if (selectionIndex !== -1) {
+        this._selection = this.selection.filter(
+          (val, i) => i !== selectionIndex,
+        );
+        this.onRowUnselect.emit({
+          originalEvent: event,
+          data: rowData,
+          type: 'checkbox',
+        });
+      } else {
         this._selection = [...this.selection, rowData];
-        this.onRowSelect.emit({originalEvent: event, data: rowData, type: 'checkbox'});
+        this.onRowSelect.emit({
+          originalEvent: event,
+          data: rowData,
+          type: 'checkbox',
+        });
       }
     }
 
@@ -477,9 +556,9 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
 
   findIndexInSelection(rowData: any) {
     let index: number = -1;
-    if(this.selection) {
-      for(let i = 0; i  < this.selection.length; i++) {
-        if(this.equals(rowData, this.selection[i])) {
+    if (this.selection) {
+      for (let i = 0; i < this.selection.length; i++) {
+        if (this.equals(rowData, this.selection[i])) {
           index = i;
           break;
         }
@@ -493,71 +572,70 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
 
   isSelected(rowData) {
-    if(rowData && this.selection) {
-      if(this.selection instanceof Array)
+    if (rowData && this.selection) {
+      if (this.selection instanceof Array)
         return this.findIndexInSelection(rowData) > -1;
     }
     return false;
   }
 
-  itemsSelected(){
-    if(this.selection instanceof Array)
-      return this.selection.length;
-    else{
+  itemsSelected() {
+    if (this.selection instanceof Array) return this.selection.length;
+    else {
       return 0;
     }
   }
 
   get allSelected() {
     let val = true;
-    if(this.selection) {
-      for(const data of this.value) {
-        if(!this.isSelected(data)) {
+    if (this.selection) {
+      for (const data of this.value) {
+        if (!this.isSelected(data)) {
           val = false;
           break;
         }
       }
-    }else {
+    } else {
       val = false;
     }
     return val;
   }
 
   toggleRow(row: any, event?: Event) {
-    if(!this.expandedRows) {
+    if (!this.expandedRows) {
       this.expandedRows = [];
     }
 
     let expandedRowIndex = this.findExpandedRowIndex(row);
 
-    if(expandedRowIndex != -1) {
+    if (expandedRowIndex != -1) {
       this.expandedRows.splice(expandedRowIndex, 1);
       this.onRowCollapse.emit({
         originalEvent: event,
-        data: row
+        data: row,
       });
-    }else {
-      if(!this.expandMultiple) {
+    } else {
+      if (!this.expandMultiple) {
         this.expandedRows = [];
       }
 
       this.expandedRows.push(row);
       this.onRowExpand.emit({
         originalEvent: event,
-        data: row
+        data: row,
       });
     }
 
-    if(event) {
+    if (event) {
       event.preventDefault();
     }
   }
 
   findExpandedRowIndex(row: any): number {
     let index = -1;
-    if(this.expandedRows) {
-      for(let i = 0; i < this.expandedRows.length; i++) {
-        if(this.expandedRows[i] == row) {
+    if (this.expandedRows) {
+      for (let i = 0; i < this.expandedRows.length; i++) {
+        if (this.expandedRows[i] == row) {
           index = i;
           break;
         }
@@ -571,40 +649,54 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
 
   findCell(element) {
-    if(element) {
+    if (element) {
       let cell = element;
-      while(cell && cell.tagName != 'TD') {
+      while (cell && cell.tagName != 'TD') {
         cell = cell.parentElement;
       }
 
       return cell;
-    }
-    else {
+    } else {
       return null;
     }
   }
 
-  switchCellToEditMode(cell: any, column: ColumnComponent, rowData: any, ri, ci) {
-    if(column.editable && !this.editorClick){
+  switchCellToEditMode(
+    cell: any,
+    column: ColumnComponent,
+    rowData: any,
+    ri,
+    ci,
+  ) {
+    if (column.editable && !this.editorClick) {
       this.editorClick = true;
       this.bindDocumentEditListener();
 
-      if(cell != this.editingCell) {
-        if(this.editingCell && this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty').length == 0) {
+      if (cell != this.editingCell) {
+        if (
+          this.editingCell &&
+          this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty')
+            .length == 0
+        ) {
           this.domHandler.removeClass(this.editingCell, 'm-cell-editing');
         }
 
         this.editingCell = cell;
-        this.onEditInit.emit({column: column, data: rowData});
+        this.onEditInit.emit({ column: column, data: rowData });
         this.domHandler.addClass(cell, 'm-cell-editing');
-        let focusable = this.domHandler.findSingle(cell, '.m-cell-editor input');
-        if(focusable) {
-          setTimeout(() => this.domHandler.invokeElementMethod(focusable, 'focus'), 50);
+        let focusable = this.domHandler.findSingle(
+          cell,
+          '.m-cell-editor input',
+        );
+        if (focusable) {
+          setTimeout(
+            () => this.domHandler.invokeElementMethod(focusable, 'focus'),
+            50,
+          );
         }
         this.editRowIndex = ri;
         this.editCellIndex = ci;
       }
-
     }
   }
 
@@ -616,7 +708,7 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
 
   closeCell() {
-    if(this.editingCell) {
+    if (this.editingCell) {
       this.domHandler.removeClass(this.editingCell, 'm-cell-editing');
       this.editingCell = null;
       this.editRowIndex = null;
@@ -626,148 +718,200 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
   }
 
   bindDocumentEditListener() {
-    if(!this.documentEditListener) {
-      this.documentEditListener = this.renderer.listen('document', 'click', (event) => {
-        if(!this.editorClick) {
-          this.closeCell();
-        }
-        this.editorClick = false;
-      });
+    if (!this.documentEditListener) {
+      this.documentEditListener = this.renderer.listen(
+        'document',
+        'click',
+        event => {
+          if (!this.editorClick) {
+            this.closeCell();
+          }
+          this.editorClick = false;
+        },
+      );
     }
   }
 
   unbindDocumentEditListener() {
-    if(this.documentEditListener) {
+    if (this.documentEditListener) {
       this.documentEditListener();
       this.documentEditListener = null;
     }
   }
 
-  onCellEditorKeydown(event, column: ColumnComponent, rowData: any, rowIndex: number) {
-    if(column.editable) {
-      //enter
-      if(event.keyCode == 13) {
-        if(this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty').length == 0) {
+  onCellEditorKeydown(
+    event,
+    column: ColumnComponent,
+    rowData: any,
+    rowIndex: number,
+  ) {
+    if (column.editable) {
+      // enter
+      if (event.keyCode == 13) {
+        if (
+          this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty')
+            .length == 0
+        ) {
           this.switchCellToViewMode(event.target);
           event.preventDefault();
         }
-      }
-
-      //escape
-      else if(event.keyCode == 27) {
+      } else if (event.keyCode == 27) {
+        // escape
         this.switchCellToViewMode(event.target);
         event.preventDefault();
       }
-
     }
   }
 
-  onCellEditorInput(event, column: ColumnComponent, rowData: any, rowIndex: number) {
-    if(column.editable) {
-      this.onEdit.emit({originalEvent: event, column: column, data: rowData, index: rowIndex});
+  onCellEditorInput(
+    event,
+    column: ColumnComponent,
+    rowData: any,
+    rowIndex: number,
+  ) {
+    if (column.editable) {
+      this.onEdit.emit({
+        originalEvent: event,
+        column: column,
+        data: rowData,
+        index: rowIndex,
+      });
     }
   }
 
-  onCellEditorChange(event, column: ColumnComponent, rowData: any, rowIndex: number) {
-    if(column.editable) {
+  onCellEditorChange(
+    event,
+    column: ColumnComponent,
+    rowData: any,
+    rowIndex: number,
+  ) {
+    if (column.editable) {
       this.editChanged = true;
 
-      this.onEditComplete.emit({column: column, data: rowData, index: rowIndex});
+      this.onEditComplete.emit({
+        column: column,
+        data: rowData,
+        index: rowIndex,
+      });
     }
   }
 
-  onCellEditorBlur(event, column: ColumnComponent, rowData: any, rowIndex: number) {
-    if(column.editable) {
-      if(this.editChanged)
-        this.editChanged = false;
+  onCellEditorBlur(
+    event,
+    column: ColumnComponent,
+    rowData: any,
+    rowIndex: number,
+  ) {
+    if (column.editable) {
+      if (this.editChanged) this.editChanged = false;
       else
-        this.onEditCancel.emit({column: column, data: rowData, index: rowIndex});
+        this.onEditCancel.emit({
+          column: column,
+          data: rowData,
+          index: rowIndex,
+        });
 
       // this.closeCell();
     }
   }
 
   _filter(type?: string) {
-    if(!this.value || !this.columns) {
+    if (!this.value || !this.columns) {
       return;
     }
 
     this.filteredValue = [];
 
-    for(let i = 0; i < this.value.length; i++) {
+    for (let i = 0; i < this.value.length; i++) {
       let globalMatch = false;
 
-      for(let j = 0; j < this.columns.length; j++) {
+      for (let j = 0; j < this.columns.length; j++) {
         let col = this.columns[j];
 
-        if(this.header.globalSearch && !globalMatch) {
-          globalMatch = this.filterContains(this.resolveFieldData(this.value[i], col.field), this.globalFilterString);
+        if (this.header.globalSearch && !globalMatch) {
+          globalMatch = this.filterContains(
+            this.resolveFieldData(this.value[i], col.field),
+            this.globalFilterString,
+          );
         }
       }
 
-      if(globalMatch) {
+      if (globalMatch) {
         this.filteredValue.push(this.value[i]);
       }
     }
 
-    if(this.filteredValue.length === this.value.length) {
+    if (this.filteredValue.length === this.value.length) {
       this.filteredValue = null;
     }
 
-    if(this.filterLocal)
+    if (this.filterLocal)
       this.updateDataToRender(this.filteredValue || this.value);
 
     this.onFilter.emit({
-        filterQuery: this.globalFilterString,
-        filteredValue: this.filteredValue || this.value,
-        type: type
+      filterQuery: this.globalFilterString,
+      filteredValue: this.filteredValue || this.value,
+      type: type,
     });
   }
 
   filterContains(value, filter): boolean {
-    if(filter === undefined || filter === null || (typeof filter === 'string' && filter.trim() === '')) {
+    if (
+      filter === undefined ||
+      filter === null ||
+      (typeof filter === 'string' && filter.trim() === '')
+    ) {
       return true;
     }
 
-    if(value === undefined || value === null) {
+    if (value === undefined || value === null) {
       return false;
     }
 
-    return value.toString().toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+    return (
+      value
+        .toString()
+        .toLowerCase()
+        .indexOf(filter.toLowerCase()) !== -1
+    );
   }
 
   hasFilter() {
-    return (this.globalFilterString && this.globalFilterString.trim().length);
+    return this.globalFilterString && this.globalFilterString.trim().length;
   }
 
-  public reload(){
+  public reload() {
     this.onReload.emit();
   }
 
-  public exportCSV(csvSeparator: string, exportFilename: string, selectionOnly: boolean) {
+  public exportCSV(
+    csvSeparator: string,
+    exportFilename: string,
+    selectionOnly: boolean,
+  ) {
     let data = this.filteredValue || this.value;
     let csv = '\ufeff';
 
-    if(selectionOnly) {
+    if (selectionOnly) {
       data = [];
-      if(this.filteredValue){
-        if(this.selection && this.selection instanceof Array)
-          this.selection.forEach((selectedRow) => {
-            if(this.filteredValue.indexOf(selectedRow) !== -1)
+      if (this.filteredValue) {
+        if (this.selection && this.selection instanceof Array)
+          this.selection.forEach(selectedRow => {
+            if (this.filteredValue.indexOf(selectedRow) !== -1)
               data.push(selectedRow);
           });
-      }else{
-        if(this.selection && this.selection instanceof Array)
+      } else {
+        if (this.selection && this.selection instanceof Array)
           data = this.selection;
       }
     }
 
     // headers
-    for(let i = 0; i < this.columns.length; i++) {
-      if(this.columns[i].field) {
+    for (let i = 0; i < this.columns.length; i++) {
+      if (this.columns[i].field) {
         csv += '"' + (this.columns[i].header || this.columns[i].field) + '"';
 
-        if(i < (this.columns.length - 1)) {
+        if (i < this.columns.length - 1) {
           csv += csvSeparator;
         }
       }
@@ -776,34 +920,33 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     // body
     data.forEach((record, i) => {
       csv += '\n';
-      for(let i = 0; i < this.columns.length; i++) {
-        if(this.columns[i].field) {
-          csv += '"' + this.resolveFieldData(record, this.columns[i].field) + '"';
+      for (let i = 0; i < this.columns.length; i++) {
+        if (this.columns[i].field) {
+          csv +=
+            '"' + this.resolveFieldData(record, this.columns[i].field) + '"';
 
-          if(i < (this.columns.length - 1)) {
+          if (i < this.columns.length - 1) {
             csv += csvSeparator;
           }
         }
       }
     });
 
-    let blob = new Blob([csv],{
-      type: 'text/csv;charset=utf-8;'
+    let blob = new Blob([csv], {
+      type: 'text/csv;charset=utf-8;',
     });
 
-    if(window.navigator.msSaveOrOpenBlob) {
+    if (window.navigator.msSaveOrOpenBlob) {
       navigator.msSaveOrOpenBlob(blob, exportFilename + '.csv');
-    }
-    else {
+    } else {
       let link = document.createElement('a');
       link.style.display = 'none';
       document.body.appendChild(link);
-      if(link.download !== undefined) {
+      if (link.download !== undefined) {
         link.setAttribute('href', URL.createObjectURL(blob));
         link.setAttribute('download', exportFilename + '.csv');
         link.click();
-      }
-      else {
+      } else {
         csv = 'data:text/csv;charset=utf-8,' + csv;
         window.open(encodeURI(csv));
       }
@@ -811,15 +954,31 @@ export class DataTable implements OnInit, AfterContentInit, AfterViewInit, OnDes
     }
   }
 
-  ngOnDestroy(){
-
-  }
-
+  ngOnDestroy() {}
 }
 
 @NgModule({
   imports: [CommonModule, MaterialModule, FormsModule],
   exports: [DataTable, ColumnComponent, MomentumTemplate, Header, Footer],
-  declarations: [DataTable, ColumnComponent, HeaderComponent, FooterComponent, ColumnHeaderComponent, ColumnFooterComponent,  TableBodyComponent, EmptyTableLoader, RowExpansionLoader, MomentumTemplate, GlobalHeaderTemplateLoader, GlobalFooterTemplateLoader, Header, Footer, ColumnHeaderTemplateLoader, ColumnBodyTemplateLoader, ColumnFooterTemplateLoader, ColumnEditorTemplateLoader]
+  declarations: [
+    DataTable,
+    ColumnComponent,
+    HeaderComponent,
+    FooterComponent,
+    ColumnHeaderComponent,
+    ColumnFooterComponent,
+    TableBodyComponent,
+    EmptyTableLoader,
+    RowExpansionLoader,
+    MomentumTemplate,
+    GlobalHeaderTemplateLoader,
+    GlobalFooterTemplateLoader,
+    Header,
+    Footer,
+    ColumnHeaderTemplateLoader,
+    ColumnBodyTemplateLoader,
+    ColumnFooterTemplateLoader,
+    ColumnEditorTemplateLoader,
+  ],
 })
-export class MomentumTableModule { }
+export class MomentumTableModule {}

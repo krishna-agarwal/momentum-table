@@ -1,16 +1,21 @@
 import {
-  Component, EmbeddedViewRef, forwardRef, Inject, Input, OnDestroy, OnInit,
-  ViewContainerRef
+  Component,
+  EmbeddedViewRef,
+  forwardRef,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewContainerRef,
 } from '@angular/core';
-import {DataTable} from './datatable';
-import {ColumnComponent} from './columns';
+import { DataTable } from './datatable';
+import { ColumnComponent } from './columns';
 
 @Component({
   selector: 'm-columnHeaderTemplateLoader',
-  template: ``
+  template: ``,
 })
 export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
-
   @Input() column: any;
 
   view: EmbeddedViewRef<any>;
@@ -18,9 +23,12 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
   constructor(public viewContainer: ViewContainerRef) {}
 
   ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.headerTemplate, {
-      '\$implicit': this.column
-    });
+    this.view = this.viewContainer.createEmbeddedView(
+      this.column.headerTemplate,
+      {
+        $implicit: this.column,
+      },
+    );
   }
 
   ngOnDestroy() {
@@ -48,7 +56,8 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
       </th>
     </tr>
   `,
-  styles: [`
+  styles: [
+    `
     tr {
       text-align: left;
       font-size: 12px;
@@ -84,9 +93,13 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
       font-size: 12px;
       vertical-align: middle;
     }
-  `]
+  `,
+  ],
 })
 export class ColumnHeaderComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
+  constructor(
+    @Inject(forwardRef(() => DataTable))
+    public dt: DataTable,
+  ) {}
   @Input('mColumnHeader') columns: ColumnComponent[];
 }

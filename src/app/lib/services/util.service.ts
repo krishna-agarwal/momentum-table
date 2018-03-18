@@ -23,7 +23,7 @@ export class ObjectUtils {
       obj1._$visited = true;
       let flag = true;
       for (let p in obj1) {
-        if (p === "_$visited") continue;
+        if (p === '_$visited') continue;
         if (obj1.hasOwnProperty(p) !== obj2.hasOwnProperty(p)) {
           flag = false;
         }
@@ -43,7 +43,7 @@ export class ObjectUtils {
         }
       }
 
-      for (var p in obj2) {
+      for (let p in obj2) {
         if (typeof (obj1[p]) == 'undefined') flag = false;
       }
 

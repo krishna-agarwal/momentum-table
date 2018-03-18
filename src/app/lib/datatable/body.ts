@@ -1,16 +1,24 @@
 import {
-  Component, EmbeddedViewRef, forwardRef, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef,
-  ViewContainerRef
+  Component,
+  EmbeddedViewRef,
+  forwardRef,
+  Inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  TemplateRef,
+  ViewContainerRef,
 } from '@angular/core';
-import {DataTable} from './datatable';
-import {ColumnComponent} from './columns';
+import { DataTable } from './datatable';
+import { ColumnComponent } from './columns';
 
 @Component({
   selector: 'm-columnBodyTemplateLoader',
-  template: ``
+  template: ``,
 })
 export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
-
   @Input() column: any;
 
   @Input() row: any;
@@ -22,19 +30,22 @@ export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
   constructor(public viewContainer: ViewContainerRef) {}
 
   ngOnInit() {
-    this.view = this.viewContainer.createEmbeddedView(this.column.bodyTemplate, {
-      '\$implicit': this.column,
-      'row': this.row,
-      'rowIndex': this.rowIndex
-    });
+    this.view = this.viewContainer.createEmbeddedView(
+      this.column.bodyTemplate,
+      {
+        $implicit: this.column,
+        row: this.row,
+        rowIndex: this.rowIndex,
+      },
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if(!this.view) {
+    if (!this.view) {
       return;
     }
 
-    if('rowIndex' in changes) {
+    if ('rowIndex' in changes) {
       this.view.context.rowIndex = changes['rowIndex'].currentValue;
     }
   }
@@ -46,10 +57,9 @@ export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
 
 @Component({
   selector: 'm-rowExpansionLoader',
-  template: ``
+  template: ``,
 })
 export class RowExpansionLoader implements OnInit, OnDestroy {
-
   @Input() template: TemplateRef<any>;
 
   @Input() rowData: any;
@@ -62,8 +72,8 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.view = this.viewContainer.createEmbeddedView(this.template, {
-      '\$implicit': this.rowData,
-      'rowIndex': this.rowIndex
+      $implicit: this.rowData,
+      rowIndex: this.rowIndex,
     });
   }
 
@@ -74,10 +84,9 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
 
 @Component({
   selector: 'm-emptyTableLoader',
-  template: ``
+  template: ``,
 })
 export class EmptyTableLoader implements OnInit, OnDestroy {
-
   @Input() template: TemplateRef<any>;
 
   view: EmbeddedViewRef<any>;
@@ -138,7 +147,8 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
       </td>
     </tr>
   `,
-  styles: [`
+  styles: [
+    `
     td{
       position: relative;
     }
@@ -196,10 +206,14 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
       color: #757575;
       cursor: pointer;
     }
-  `]
+  `,
+  ],
 })
 export class TableBodyComponent {
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) { };
+  constructor(
+    @Inject(forwardRef(() => DataTable))
+    public dt: DataTable,
+  ) {}
   @Input('mTableBody') columns: ColumnComponent[];
   @Input() value;
   hoverRowIndex;

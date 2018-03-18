@@ -1,21 +1,33 @@
 import {
-  AfterViewInit, Component, ContentChild, ElementRef, EmbeddedViewRef, EventEmitter, forwardRef, Inject, Input,
+  AfterViewInit,
+  Component,
+  ContentChild,
+  ElementRef,
+  EmbeddedViewRef,
+  EventEmitter,
+  forwardRef,
+  Inject,
+  Input,
   OnChanges,
-  OnDestroy, OnInit, Output,
-  Renderer2, SimpleChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  Renderer2,
+  SimpleChanges,
   TemplateRef,
-  ViewChild, ViewContainerRef
+  ViewChild,
+  ViewContainerRef,
 } from '@angular/core';
-import {DataTable} from './datatable';
+import { DataTable } from './datatable';
 
 @Component({
   selector: 'm-header',
-  template: ``
+  template: ``,
 })
 export class Header {
   @Input() title: string;
   @Input() globalSearch: boolean = false;
-  @Input() searchField: string = 'line'
+  @Input() searchField: string = 'line';
   @Input() colSetting: boolean = true;
   @Input() export: boolean = false;
   @Input() csvSeparator: string = ',';
@@ -24,15 +36,15 @@ export class Header {
   @Input() reload: boolean = false;
 
   @ContentChild(TemplateRef) template: TemplateRef<any>;
-  constructor(){ }
+  constructor() {}
 }
 
 @Component({
   selector: 'm-globalHeaderTemplateLoader',
-  template: ``
+  template: ``,
 })
-export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy {
-
+export class GlobalHeaderTemplateLoader
+  implements OnInit, OnChanges, OnDestroy {
   @Input() header: any;
 
   view: EmbeddedViewRef<any>;
@@ -41,12 +53,12 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
 
   ngOnInit() {
     this.view = this.viewContainer.createEmbeddedView(this.header.template, {
-      '\$implicit': this.header
+      $implicit: this.header,
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if(!this.view) {
+    if (!this.view) {
       return;
     }
   }
@@ -113,7 +125,8 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
 
     </div>
   `,
-  styles: [`
+  styles: [
+    `
     .card-header{
       height: var(--card-header-height, 64px);
       padding: var(--card-header-padding, 0 14px 0 24px);
@@ -203,9 +216,10 @@ export class GlobalHeaderTemplateLoader implements OnInit, OnChanges, OnDestroy 
       outline: none;
       font-size: 16px;
     }
-  `]
+  `,
+  ],
 })
-export class HeaderComponent implements AfterViewInit, OnDestroy{
+export class HeaderComponent implements AfterViewInit, OnDestroy {
   @Input('mHeader') header: Header;
 
   @Output() filterChange: EventEmitter<any> = new EventEmitter();
@@ -221,25 +235,39 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
 
   colToggleClick: boolean = false;
 
-  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable, public renderer: Renderer2) { };
+  constructor(
+    @Inject(forwardRef(() => DataTable))
+    public dt: DataTable,
+    public renderer: Renderer2,
+  ) {}
 
-  ngAfterViewInit(){
-    if(this.globalFilterField){
-      this.globalFilterFunction = this.renderer.listen(this.globalFilterField.nativeElement, 'keyup', () => {
-        this.filterChange.emit({value: this.globalFilterField.nativeElement.value, type: 'input'});
-      });
+  ngAfterViewInit() {
+    if (this.globalFilterField) {
+      this.globalFilterFunction = this.renderer.listen(
+        this.globalFilterField.nativeElement,
+        'keyup',
+        () => {
+          this.filterChange.emit({
+            value: this.globalFilterField.nativeElement.value,
+            type: 'input',
+          });
+        },
+      );
     }
   }
 
-  emitChange(){
-    this.filterChange.emit({value: this.globalFilterField.nativeElement.value, type: 'click'});
+  emitChange() {
+    this.filterChange.emit({
+      value: this.globalFilterField.nativeElement.value,
+      type: 'click',
+    });
   }
 
-  toggleSearch(state: boolean){
-    if(!state){
+  toggleSearch(state: boolean) {
+    if (!state) {
       this.globalFilterField.nativeElement.value = '';
-      this.filterChange.emit({value: '', type: 'input'});
-    }else {
+      this.filterChange.emit({ value: '', type: 'input' });
+    } else {
       this.globalFilterField.nativeElement.focus();
     }
     this.searchOpen = state;
@@ -253,8 +281,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
 
   closeColSetting() {
     this.colSettingOpen = false;
-    if(!this.colToggleClick)
-      this.unbindDocumentEditListener();
+    if (!this.colToggleClick) this.unbindDocumentEditListener();
   }
 
   toggleColumn(col) {
@@ -262,10 +289,14 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
   }
 
   bindDocumentEditListener() {
-    if(!this.documentEditListener) {
-      this.documentEditListener = this.renderer.listen('document', 'click', (event) => {
-        this.closeColSetting();
-      });
+    if (!this.documentEditListener) {
+      this.documentEditListener = this.renderer.listen(
+        'document',
+        'click',
+        event => {
+          this.closeColSetting();
+        },
+      );
     }
     setTimeout(() => {
       this.colSettingOpen = true;
@@ -274,18 +305,17 @@ export class HeaderComponent implements AfterViewInit, OnDestroy{
   }
 
   unbindDocumentEditListener() {
-    if(this.documentEditListener) {
+    if (this.documentEditListener) {
       this.documentEditListener();
       this.documentEditListener = null;
     }
   }
 
-  ngOnDestroy(){
-    if(this.globalFilterFunction) {
+  ngOnDestroy() {
+    if (this.globalFilterFunction) {
       this.globalFilterFunction();
     }
 
     this.unbindDocumentEditListener();
   }
-
 }

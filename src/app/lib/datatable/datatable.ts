@@ -2,10 +2,10 @@ import {
   AfterContentChecked,
   AfterContentInit,
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   ContentChildren,
-  Directive,
   DoCheck,
   EventEmitter,
   Input,
@@ -41,6 +41,7 @@ import {
   ColumnFooterTemplateLoader,
 } from './column-footer';
 import { MomentumTemplate } from './template.directive';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'm-table',
@@ -191,11 +192,14 @@ export class DataTable
 
   differ: any;
 
+  columnsSubscription$: Subscription;
+
   constructor(
     public domHandler: DomHandler,
     public objectUtils: ObjectUtils,
     public renderer: Renderer2,
     public differs: IterableDiffers,
+    public changeDetector: ChangeDetectorRef
   ) {
     this.differ = differs.find([]).create(null);
   }
@@ -204,6 +208,11 @@ export class DataTable
 
   ngAfterContentInit() {
     this.initColumns();
+
+    this.columnsSubscription$ = this.cols.changes.subscribe(_ => {
+      this.initColumns();
+      this.changeDetector.markForCheck();
+    });
 
     this.templates.forEach(item => {
       switch (item.getType()) {
@@ -236,7 +245,8 @@ export class DataTable
   }
 
   set value(val: any[]) {
-    this._value = val;
+    this._value = val ? [...val] : null;
+    this.handleDataChange();
 
     this.valueChange.emit(this.value);
   }
@@ -276,10 +286,10 @@ export class DataTable
   ngDoCheck() {}
 
   ngAfterContentChecked() {
-    let changes = this.differ.diff(this.value);
-    if (changes) {
-      this.handleDataChange();
-    }
+    // let changes = this.differ.diff(this.value);
+    // if (changes) {
+    //   this.handleDataChange();
+    // }
   }
 
   handleDataChange() {
@@ -314,7 +324,7 @@ export class DataTable
     pageIndex: number = 0,
     pageSize: number = this.footer ? this.footer.pageSize : 0,
   ) {
-    this.totalRecords = dataSource.length;
+    this.totalRecords = dataSource ? dataSource.length : 0;
     this.pageIndex = pageIndex;
 
     if (this.footer && this.footer.paginator) {
@@ -409,6 +419,8 @@ export class DataTable
         order: this.sortOrder,
       });
     }
+
+    this.updateDataToRender(this.filteredValue || this.value);
   }
 
   sortSingle() {
@@ -954,7 +966,11 @@ export class DataTable
     }
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    if (this.columnsSubscription$) {
+      this.columnsSubscription$.unsubscribe();
+    }
+  }
 }
 
 @NgModule({

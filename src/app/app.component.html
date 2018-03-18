@@ -1,11 +1,11 @@
 <m-table class="test" [value]=countries
-         [sortField]="'country'" [sortOrder]="1" [sortLocal]="false" (onSort)="changeSort($event)"
+         [sortField]="'country'" [sortOrder]="1" [sortLocal]="true" (onSort)="changeSort($event)"
          (onRowClick)="rowClick($event)"
          [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows"
          [expandable]="true" [expandMultiple]="true" (onRowExpand)="rowExpanded($event)" (onRowCollapse)="rowCollapse($event)"
          (onEditComplete)="editComplete($event)" (onEditInit)="editInit($event)" (onEdit)="edit($event)" (onEditCancel)="editCancel($event)"
          (valueChange)="valueChange($event)"
-         (onFilter)="onFilter($event)" [filterLocal]="false"
+         (onFilter)="onFilter($event)" [filterLocal]="true"
          (onReload)="tableReload()"
          (onPage)="onPage($event)">
 

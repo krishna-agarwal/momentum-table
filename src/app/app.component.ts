@@ -37,16 +37,16 @@ export class AppComponent implements OnInit{
   }
 
   changeSort(event) {
-    console.log('sort', event);
-    this.countries = [];
-    this.emptyMsg = 'Loading...';
-    setTimeout( () => {
-      this.countries = [
-        {'country': 'Afghanistan', 'population': 35530081, 'capital': 'Kabul', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Afghanistan.jpg'},
-        {'country': 'India', 'population': 1339180127, 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'},
-        {'country': 'Iraq', 'population': 38274618, 'capital': 'Baghdad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Iraq.jpg'},
-      ];
-    }, 2000);
+    // console.log('sort', event);
+    // this.countries = [];
+    // this.emptyMsg = 'Loading...';
+    // setTimeout( () => {
+    //   this.countries = [
+    //     {'country': 'Afghanistan', 'population': 35530081, 'capital': 'Kabul', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Afghanistan.jpg'},
+    //     {'country': 'India', 'population': 1339180127, 'capital': 'New Delhi', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/India.jpg'},
+    //     {'country': 'Iraq', 'population': 38274618, 'capital': 'Baghdad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Iraq.jpg'},
+    //   ];
+    // }, 2000);
   }
 
   rowClick(event) {

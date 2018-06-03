@@ -81,7 +81,7 @@ export class GlobalHeaderTemplateLoader
       <div class="tool-box">
         <div class="search-setting-wrapper" *ngIf="header.globalSearch">
           <div *ngIf="header.searchField == 'line'" class="line-search">
-            <mat-form-field class="m-search-form" [floatPlaceholder]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
+            <mat-form-field class="m-search-form" [floatLabel]="'never'" [ngClass]="[searchOpen ? 'search-open' : 'search-close']">
               <input matInput #globalFilterField placeholder="Search...">
             </mat-form-field>
             <button mat-icon-button *ngIf="!searchOpen" class="search-icon" (click)="toggleSearch(true)">

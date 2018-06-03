@@ -117,7 +117,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
           </span>
           <div class="m-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable && rowIndex === dt.editRowIndex && colIndex === dt.editCellIndex">
             <mat-card matInput class="m-input-card" *ngIf="!col.editorTemplate">
-              <mat-form-field [floatPlaceholder]="'never'" class="m-input-form">
+              <mat-form-field [floatLabel]="'never'" class="m-input-form">
                 <input matInput placeholder="{{col.header}}" [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)"
                        (keydown)="dt.onCellEditorKeydown($event, col, row, rowIndex)" (blur)="dt.onCellEditorBlur($event, col, row, rowIndex)"
                        (input)="dt.onCellEditorInput($event, col, row, rowIndex)">

@@ -1,3 +1,6 @@
+* {
+  box-sizing: border-box;
+}
 :host ::ng-deep .country-header-class{
   min-width: 200px !important;
 }
@@ -7,14 +10,18 @@
 }
 
 :host{
-  --table-height: inherit;
+  // --table-height: 200px;
   --column-padding: 0 28px;
   --first-column-padding: 0 0 0 24px;
   --last-column-padding: 0 24px 0 0;
 
-  --row-height: 47px;
-  --table-header-height: 55px;
-  --table-footer-height: 51px;
+  --row-height: 48px;
+  --table-header-height: 56px;
+  --table-footer-height: 56px;
+  --table-border-color: #ccc;
 
-  --card-footer-height: 56px;
+  --card-footer-height: auto;
+
+  --row-selection-color: #eee;
+  --row-hover-color: #eee;
 }

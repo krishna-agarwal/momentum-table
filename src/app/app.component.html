@@ -1,56 +1,108 @@
-<m-table class="test" [value]=countries
-         [sortField]="'country'" [sortOrder]="1" [sortLocal]="true" (onSort)="changeSort($event)"
+<m-table class="test"
+         [value]=countries
+         [sortField]="'country'"
+         [sortOrder]="1"
+         [sortLocal]="true"
+         (onSort)="changeSort($event)"
          (onRowClick)="rowClick($event)"
-         [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows"
-         [expandable]="true" [expandMultiple]="true" (onRowExpand)="rowExpanded($event)" (onRowCollapse)="rowCollapse($event)"
-         (onEditComplete)="editComplete($event)" (onEditInit)="editInit($event)" (onEdit)="edit($event)" (onEditCancel)="editCancel($event)"
+         [selectable]="true"
+         [selectionMode]="'multiple'"
+         [selectionHandler]="true"
+         (onRowSelect)="rowSelect($event)"
+         (onRowUnselect)="rowUnselect($event)"
+         (selectionChange)="onSelectionChange($event)"
+         [(selection)]="selectedRows"
+         [expandable]="true"
+         [expandMultiple]="true"
+         (onRowExpand)="rowExpanded($event)"
+         (onRowCollapse)="rowCollapse($event)"
+         (onEditComplete)="editComplete($event)"
+         (onEditInit)="editInit($event)"
+         (onEdit)="edit($event)"
+         (onEditCancel)="editCancel($event)"
          (valueChange)="valueChange($event)"
-         (onFilter)="onFilter($event)" [filterLocal]="true"
+         (onFilter)="onFilter($event)"
+         [filterLocal]="true"
          (onReload)="tableReload()"
          (onPage)="onPage($event)">
 
-  <m-header title="Countries" [globalSearch]="true" [searchField]="'box'" [colSetting]="true" [reload]="true" [export]="true">
+  <m-header title="Countries"
+            [globalSearch]="true"
+            [searchField]="'box'"
+            [colSetting]="true"
+            [reload]="true"
+            [export]="true">
     <!--<ng-template let-header>-->
-      <!--<div>-->
-        <!--<button>Hello</button>-->
-      <!--</div>-->
+    <!--<div>-->
+    <!--<button>Hello</button>-->
+    <!--</div>-->
     <!--</ng-template>-->
   </m-header>
-  <m-footer [paginator]="true" [pageSize]="5"></m-footer>
+  <m-footer [paginator]="true"
+            [pageSize]="5"></m-footer>
 
-  <m-column field="country" header="Country" [sortable]="true" [editable]="true" [editTrigger]="'button'" [colHeadClass]="'country-header-class'"></m-column>
+  <m-column field="country"
+            header="Country"
+            [sortable]="true"
+            [editable]="true"
+            [editTrigger]="'button'"
+            [colHeadClass]="'country-header-class'"></m-column>
 
-  <m-column field="population" header="Population" [sortable]="true" [editable]="true" [colHeadClass]="'align-right'" [colBodyClass]="'align-right'"></m-column>
+  <m-column field="population"
+            header="Population"
+            [sortable]="true"
+            [editable]="true"
+            [colHeadClass]="'align-right'"
+            [colBodyClass]="'align-right'"></m-column>
 
-  <m-column field="capital" header="Capital" [sortable]="true"></m-column>
+  <m-column field="capital"
+            header="Capital"
+            [sortable]="true"></m-column>
 
-  <m-column field="continent" header="Continent" [sortable]="true"></m-column>
+  <m-column field="continent"
+            header="Continent"
+            [sortable]="true"></m-column>
 
-  <m-column field="flag" header="flag" [sortable]="true" [editable]="true">
-    <ng-template let-col mTemplate="header">
-      <button type="button" (click)="flagHeaderClick(col)">Falg</button>
+  <m-column field="flag"
+            header="flag"
+            [sortable]="true"
+            [editable]="true">
+    <ng-template let-col
+                 mTemplate="header">
+      <button type="button"
+              (click)="flagHeaderClick(col)">Falg</button>
     </ng-template>
 
-    <ng-template let-col let-row="row" mTemplate="body">
-      <img [src]="row.flag" width="35px" (click)="flagClicked($event,row)"/>
+    <ng-template let-col
+                 let-row="row"
+                 mTemplate="body">
+      <img [src]="row.flag"
+           width="35px"
+           (click)="flagClicked($event,row)" />
     </ng-template>
 
-    <ng-template let-col let-row="row" mTemplate="editor">
+    <ng-template let-col
+                 let-row="row"
+                 mTemplate="editor">
       <div style="background: gray; padding: 10px">
-        <img [src]="row.flag" width="100%">
+        <img [src]="row.flag"
+             width="100%">
         <input [(ngModel)]="row[col.field]">
       </div>
     </ng-template>
   </m-column>
 
-  <ng-template let-row let-index="rowIndex" mTemplate="expansion">
+  <ng-template let-row
+               let-index="rowIndex"
+               mTemplate="expansion">
     {{index}} - {{row.country}}
     <br>
-    <img [src]="row.flag" width="100px" style="padding: 20px 0px;">
+    <img [src]="row.flag"
+         width="100px"
+         style="padding: 20px 0px;">
   </ng-template>
 
   <ng-template mTemplate="emptyTable">
     {{emptyMsg}}
   </ng-template>
 </m-table>
-

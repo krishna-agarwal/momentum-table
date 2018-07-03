@@ -53,15 +53,18 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
   `,
   styles: [
     `
+    * {
+      box-sizing: border-box;
+    }
     td{
       position: relative;
     }
     tr {
       text-align: left;
       font-size: 12px;
-      height: var(--table-footer-height, 51px);
+      height: var(--table-footer-height, 50px);
       color: rgba(0, 0, 0, 0.54);
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid var(--table-border-color, #ccc);
     }
     tr:hover{
       background: #fff;

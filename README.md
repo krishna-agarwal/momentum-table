@@ -90,7 +90,7 @@ For all features please follow [documentation](https://krishna-agarwal.gitbooks.
 ## Documentation and Demo
 [Demo](https://stackblitz.com/edit/momentum-table-demo)
 
-[documentation](https://github.com/krishna-agarwal/momentum-table/wiki/Documentation)
+[documentation](https://krishna-agarwal.gitbooks.io/momentum-table)
 
 
 

@@ -19,8 +19,8 @@ import { DataTable } from './datatable';
   template: ``,
 })
 export class Footer {
-  @Input() paginator: boolean = false;
-  @Input() pageSize: number = 10;
+  @Input() paginator = false;
+  @Input() pageSize = 10;
   @Input() pageSizeOptions: number[] = [5, 10, 25];
   @Input() length: number;
   @Input() pageIndex: number;
@@ -73,10 +73,12 @@ export class GlobalFooterTemplateLoader
   `,
   styles: [
     `
+    * {
+      box-sizing: border-box;
+    }
     .card-footer{
-      height: var(--card-footer-height, 56px);
-      padding: var(--card-footer-padding, 0 14px 0 24px);
-      border-top: 1px solid #e0e0e0;
+      height: var(--card-footer-height, auto);
+      border-top: 1px solid var(--table-border-color, #ccc);
     }
   `,
   ],

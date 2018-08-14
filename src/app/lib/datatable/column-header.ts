@@ -61,11 +61,7 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
     tr {
       text-align: left;
       font-size: 12px;
-      height: var(--table-header-height, 55px);
-      color: rgba(0, 0, 0, 0.54);
-    }
-    tr:hover{
-      background: #fff;
+      height: var(--table-header-height, 56px);
     }
     th:not(:first-child){
       padding: var(--column-padding, 0 28px);
@@ -78,7 +74,6 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
     }
     th{
       top: 0;
-      background: #fff;
       z-index: 2 !important;
     }
     .m-checkbox-header, .m-expand-header{

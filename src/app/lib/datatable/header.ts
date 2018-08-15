@@ -26,14 +26,14 @@ import { DataTable } from './datatable';
 })
 export class Header {
   @Input() title: string;
-  @Input() globalSearch = false;
-  @Input() searchField = 'line';
-  @Input() colSetting = true;
-  @Input() export = false;
-  @Input() csvSeparator = ',';
-  @Input() exportFilename = 'download';
-  @Input() exportSelectionOnly = false;
-  @Input() reload = false;
+  @Input() globalSearch: boolean = false;
+  @Input() searchField: string = 'line';
+  @Input() colSetting: boolean = true;
+  @Input() export: boolean = false;
+  @Input() csvSeparator: string = ',';
+  @Input() exportFilename: string = 'download';
+  @Input() exportSelectionOnly: boolean = false;
+  @Input() reload: boolean = false;
 
   @ContentChild(TemplateRef) template: TemplateRef<any>;
   constructor() {}
@@ -127,13 +127,10 @@ export class GlobalHeaderTemplateLoader
   `,
   styles: [
     `
-    * {
-      box-sizing: border-box;
-    }
     .card-header{
       height: var(--card-header-height, 64px);
       padding: var(--card-header-padding, 0 14px 0 24px);
-      border-bottom: 1px solid var(--table-border-color, #ccc);
+      border-bottom: 1px solid #e0e0e0;
       position: relative;
       display: flex;
     }
@@ -236,7 +233,7 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
 
   documentEditListener: Function;
 
-  colToggleClick = false;
+  colToggleClick: boolean = false;
 
   constructor(
     @Inject(forwardRef(() => DataTable))

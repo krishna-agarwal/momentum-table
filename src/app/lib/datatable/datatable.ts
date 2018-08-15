@@ -16,7 +16,7 @@ import {
   Output,
   QueryList,
   Renderer2,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material';
@@ -28,17 +28,17 @@ import {
   ColumnBodyTemplateLoader,
   EmptyTableLoader,
   RowExpansionLoader,
-  TableBodyComponent
+  TableBodyComponent,
 } from './body';
 import { GlobalHeaderTemplateLoader, Header, HeaderComponent } from './header';
 import { Footer, FooterComponent, GlobalFooterTemplateLoader } from './footer';
 import {
   ColumnHeaderComponent,
-  ColumnHeaderTemplateLoader
+  ColumnHeaderTemplateLoader,
 } from './column-header';
 import {
   ColumnFooterComponent,
-  ColumnFooterTemplateLoader
+  ColumnFooterTemplateLoader,
 } from './column-footer';
 import { MomentumTemplate } from './template.directive';
 import { Subscription } from 'rxjs/Subscription';
@@ -46,7 +46,7 @@ import { Subscription } from 'rxjs/Subscription';
 @Component({
   selector: 'm-table',
   template: `
-    <mat-card [ngClass]="{'m-datatable m-widget':true}" class="card-wrapper">
+    <mat-card [ngClass]="{'m-datatable m-widget':true}" [ngStyle]="{'width': width, 'height': height}" class="card-wrapper">
       <div *ngIf="header" [mHeader]="header" (filterChange)="filterChange($event)"></div>
       <div class="table-container">
         <table>
@@ -60,26 +60,25 @@ import { Subscription } from 'rxjs/Subscription';
   `,
   styles: [
     `
-      * {
-        box-sizing: border-box;
-      }
-      .card-wrapper {
-        padding: 0;
-      }
-      .table-container {
-        overflow: auto;
-        height: var(--table-height, auto);
-        width: var(--table-width, auto);
-      }
-      table {
-        /*Hack to make sure vertical scrollbar goes away */
-        border: 2px solid transparent;
-        border-collapse: collapse;
-        position: relative;
-      }
-    `
+    .card-wrapper{
+      padding: 0;
+    }
+    .table-container{
+      overflow: auto;
+      height: var(--table-height);
+      background: #fff;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.87);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      position: relative;
+    }
+  `,
   ],
-  providers: [DomHandler, ObjectUtils]
+  providers: [DomHandler, ObjectUtils],
 })
 export class DataTable
   implements
@@ -89,17 +88,21 @@ export class DataTable
     OnDestroy,
     DoCheck,
     AfterContentChecked {
-  @Input() defaultSortOrder = 1;
+  @Input() width: string = '100%';
+
+  @Input() height: string = 'auto';
+
+  @Input() defaultSortOrder: number = 1;
 
   @Output() onSort: EventEmitter<any> = new EventEmitter();
 
-  @Input() sortLocal = true;
+  @Input() sortLocal: boolean = true;
 
   @Input() selectable: boolean;
 
-  @Input() selectionMode = 'multiple';
+  @Input() selectionMode: string = 'multiple';
 
-  @Input() selectionHandler = true;
+  @Input() selectionHandler: boolean = true;
 
   @Output() selectionChange: EventEmitter<any> = new EventEmitter();
 
@@ -109,11 +112,11 @@ export class DataTable
 
   @Output() onRowUnselect: EventEmitter<any> = new EventEmitter();
 
-  @Input() expandable = false;
+  @Input() expandable: boolean = false;
 
   @Input() expandedRows: any[];
 
-  @Input() expandMultiple = true;
+  @Input() expandMultiple: boolean = true;
 
   @Output() onRowExpand: EventEmitter<any> = new EventEmitter();
 
@@ -131,7 +134,7 @@ export class DataTable
 
   @Output() onFilter: EventEmitter<any> = new EventEmitter();
 
-  @Input() filterLocal = true;
+  @Input() filterLocal: boolean = true;
 
   @Output() onReload: EventEmitter<string> = new EventEmitter();
 
@@ -147,9 +150,9 @@ export class DataTable
 
   public _value: any[];
 
-  public totalRecords = 0;
+  public totalRecords: number = 0;
 
-  public pageIndex = 0;
+  public pageIndex: number = 0;
 
   public filteredValue: any[];
 
@@ -177,7 +180,7 @@ export class DataTable
 
   _sortField: string;
 
-  _sortOrder = 1;
+  _sortOrder: number = 1;
 
   _selection: any;
 
@@ -297,7 +300,7 @@ export class DataTable
     if (this.sortField) {
       if (!this.sortColumn && this.columns) {
         this.sortColumn = this.columns.find(
-          col => col.field === this.sortField
+          col => col.field === this.sortField,
         );
       }
       if (this.sortLocal) this.sortSingle();
@@ -311,7 +314,7 @@ export class DataTable
     this.updateDataToRender(
       this.filteredValue || this.value,
       pageData.pageIndex,
-      pageData.pageSize
+      pageData.pageSize,
     );
     this.onPage.emit(pageData);
   }
@@ -319,7 +322,7 @@ export class DataTable
   updateDataToRender(
     dataSource,
     pageIndex: number = 0,
-    pageSize: number = this.footer ? this.footer.pageSize : 0
+    pageSize: number = this.footer ? this.footer.pageSize : 0,
   ) {
     this.totalRecords = dataSource ? dataSource.length : 0;
     this.pageIndex = pageIndex;
@@ -345,7 +348,7 @@ export class DataTable
       if (field.indexOf('.') === -1) {
         return data[field];
       } else {
-        const fields: string[] = field.split('.');
+        let fields: string[] = field.split('.');
         let value = data;
         for (let i = 0, len = fields.length; i < len; ++i) {
           if (value == null) {
@@ -384,7 +387,7 @@ export class DataTable
   }
 
   isEmpty() {
-    return !this.dataToRender || this.dataToRender.length === 0;
+    return !this.dataToRender || this.dataToRender.length == 0;
   }
 
   sort(event, column: ColumnComponent) {
@@ -413,7 +416,7 @@ export class DataTable
 
       this.onSort.emit({
         field: this.sortField,
-        order: this.sortOrder
+        order: this.sortOrder,
       });
     }
 
@@ -423,8 +426,8 @@ export class DataTable
   sortSingle() {
     if (this.value) {
       this.value.sort((data1, data2) => {
-        const value1 = this.resolveFieldData(data1, this.sortField);
-        const value2 = this.resolveFieldData(data2, this.sortField);
+        let value1 = this.resolveFieldData(data1, this.sortField);
+        let value2 = this.resolveFieldData(data2, this.sortField);
         let result = null;
 
         if (value1 == null && value2 != null) result = -1;
@@ -472,33 +475,33 @@ export class DataTable
           this.onRowUnselect.emit({
             originalEvent: event,
             data: rowData,
-            type: 'row'
+            type: 'row',
           });
         } else {
           this._selection = [rowData];
           this.onRowSelect.emit({
             originalEvent: event,
             data: rowData,
-            type: 'row'
+            type: 'row',
           });
         }
       } else if (this.selectionMode === 'multiple') {
         if (selected) {
           const selectionIndex = this.findIndexInSelection(rowData);
           this._selection = this.selection.filter(
-            (val, i) => i !== selectionIndex
+            (val, i) => i !== selectionIndex,
           );
           this.onRowUnselect.emit({
             originalEvent: event,
             data: rowData,
-            type: 'row'
+            type: 'row',
           });
         } else {
           this._selection = [...(this.selection || []), rowData];
           this.onRowSelect.emit({
             originalEvent: event,
             data: rowData,
-            type: 'row'
+            type: 'row',
           });
         }
       }
@@ -527,14 +530,14 @@ export class DataTable
         this.onRowSelect.emit({
           originalEvent: event,
           data: rowData,
-          type: 'checkbox'
+          type: 'checkbox',
         });
       } else {
         this._selection = [];
         this.onRowUnselect.emit({
           originalEvent: event,
           data: rowData,
-          type: 'checkbox'
+          type: 'checkbox',
         });
       }
     } else if (this.selectionMode === 'multiple') {
@@ -543,19 +546,19 @@ export class DataTable
 
       if (selectionIndex !== -1) {
         this._selection = this.selection.filter(
-          (val, i) => i !== selectionIndex
+          (val, i) => i !== selectionIndex,
         );
         this.onRowUnselect.emit({
           originalEvent: event,
           data: rowData,
-          type: 'checkbox'
+          type: 'checkbox',
         });
       } else {
         this._selection = [...this.selection, rowData];
         this.onRowSelect.emit({
           originalEvent: event,
           data: rowData,
-          type: 'checkbox'
+          type: 'checkbox',
         });
       }
     }
@@ -564,7 +567,7 @@ export class DataTable
   }
 
   findIndexInSelection(rowData: any) {
-    let index = -1;
+    let index: number = -1;
     if (this.selection) {
       for (let i = 0; i < this.selection.length; i++) {
         if (this.equals(rowData, this.selection[i])) {
@@ -615,13 +618,13 @@ export class DataTable
       this.expandedRows = [];
     }
 
-    const expandedRowIndex = this.findExpandedRowIndex(row);
+    let expandedRowIndex = this.findExpandedRowIndex(row);
 
-    if (expandedRowIndex !== -1) {
+    if (expandedRowIndex != -1) {
       this.expandedRows.splice(expandedRowIndex, 1);
       this.onRowCollapse.emit({
         originalEvent: event,
-        data: row
+        data: row,
       });
     } else {
       if (!this.expandMultiple) {
@@ -631,7 +634,7 @@ export class DataTable
       this.expandedRows.push(row);
       this.onRowExpand.emit({
         originalEvent: event,
-        data: row
+        data: row,
       });
     }
 
@@ -644,7 +647,7 @@ export class DataTable
     let index = -1;
     if (this.expandedRows) {
       for (let i = 0; i < this.expandedRows.length; i++) {
-        if (this.expandedRows[i] === row) {
+        if (this.expandedRows[i] == row) {
           index = i;
           break;
         }
@@ -654,13 +657,13 @@ export class DataTable
   }
 
   isRowExpanded(row: any): boolean {
-    return this.findExpandedRowIndex(row) !== -1;
+    return this.findExpandedRowIndex(row) != -1;
   }
 
   findCell(element) {
     if (element) {
       let cell = element;
-      while (cell && cell.tagName !== 'TD') {
+      while (cell && cell.tagName != 'TD') {
         cell = cell.parentElement;
       }
 
@@ -675,17 +678,17 @@ export class DataTable
     column: ColumnComponent,
     rowData: any,
     ri,
-    ci
+    ci,
   ) {
     if (column.editable && !this.editorClick) {
       this.editorClick = true;
       this.bindDocumentEditListener();
 
-      if (cell !== this.editingCell) {
+      if (cell != this.editingCell) {
         if (
           this.editingCell &&
           this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty')
-            .length === 0
+            .length == 0
         ) {
           this.domHandler.removeClass(this.editingCell, 'm-cell-editing');
         }
@@ -693,14 +696,14 @@ export class DataTable
         this.editingCell = cell;
         this.onEditInit.emit({ column: column, data: rowData });
         this.domHandler.addClass(cell, 'm-cell-editing');
-        const focusable = this.domHandler.findSingle(
+        let focusable = this.domHandler.findSingle(
           cell,
-          '.m-cell-editor input'
+          '.m-cell-editor input',
         );
         if (focusable) {
           setTimeout(
             () => this.domHandler.invokeElementMethod(focusable, 'focus'),
-            50
+            50,
           );
         }
         this.editRowIndex = ri;
@@ -711,7 +714,7 @@ export class DataTable
 
   switchCellToViewMode(element: any) {
     this.editingCell = null;
-    const cell = this.findCell(element);
+    let cell = this.findCell(element);
     this.domHandler.removeClass(cell, 'm-cell-editing');
     this.unbindDocumentEditListener();
   }
@@ -736,7 +739,7 @@ export class DataTable
             this.closeCell();
           }
           this.editorClick = false;
-        }
+        },
       );
     }
   }
@@ -752,19 +755,19 @@ export class DataTable
     event,
     column: ColumnComponent,
     rowData: any,
-    rowIndex: number
+    rowIndex: number,
   ) {
     if (column.editable) {
       // enter
-      if (event.keyCode === 13) {
+      if (event.keyCode == 13) {
         if (
           this.domHandler.find(this.editingCell, '.ng-invalid.ng-dirty')
-            .length === 0
+            .length == 0
         ) {
           this.switchCellToViewMode(event.target);
           event.preventDefault();
         }
-      } else if (event.keyCode === 27) {
+      } else if (event.keyCode == 27) {
         // escape
         this.switchCellToViewMode(event.target);
         event.preventDefault();
@@ -776,14 +779,14 @@ export class DataTable
     event,
     column: ColumnComponent,
     rowData: any,
-    rowIndex: number
+    rowIndex: number,
   ) {
     if (column.editable) {
       this.onEdit.emit({
         originalEvent: event,
         column: column,
         data: rowData,
-        index: rowIndex
+        index: rowIndex,
       });
     }
   }
@@ -792,7 +795,7 @@ export class DataTable
     event,
     column: ColumnComponent,
     rowData: any,
-    rowIndex: number
+    rowIndex: number,
   ) {
     if (column.editable) {
       this.editChanged = true;
@@ -800,7 +803,7 @@ export class DataTable
       this.onEditComplete.emit({
         column: column,
         data: rowData,
-        index: rowIndex
+        index: rowIndex,
       });
     }
   }
@@ -809,7 +812,7 @@ export class DataTable
     event,
     column: ColumnComponent,
     rowData: any,
-    rowIndex: number
+    rowIndex: number,
   ) {
     if (column.editable) {
       if (this.editChanged) this.editChanged = false;
@@ -817,7 +820,7 @@ export class DataTable
         this.onEditCancel.emit({
           column: column,
           data: rowData,
-          index: rowIndex
+          index: rowIndex,
         });
 
       // this.closeCell();
@@ -835,12 +838,12 @@ export class DataTable
       let globalMatch = false;
 
       for (let j = 0; j < this.columns.length; j++) {
-        const col = this.columns[j];
+        let col = this.columns[j];
 
         if (this.header.globalSearch && !globalMatch) {
           globalMatch = this.filterContains(
             this.resolveFieldData(this.value[i], col.field),
-            this.globalFilterString
+            this.globalFilterString,
           );
         }
       }
@@ -860,7 +863,7 @@ export class DataTable
     this.onFilter.emit({
       filterQuery: this.globalFilterString,
       filteredValue: this.filteredValue || this.value,
-      type: type
+      type: type,
     });
   }
 
@@ -896,7 +899,7 @@ export class DataTable
   public exportCSV(
     csvSeparator: string,
     exportFilename: string,
-    selectionOnly: boolean
+    selectionOnly: boolean,
   ) {
     let data = this.filteredValue || this.value;
     let csv = '\ufeff';
@@ -941,14 +944,14 @@ export class DataTable
       }
     });
 
-    const blob = new Blob([csv], {
-      type: 'text/csv;charset=utf-8;'
+    let blob = new Blob([csv], {
+      type: 'text/csv;charset=utf-8;',
     });
 
     if (window.navigator.msSaveOrOpenBlob) {
       navigator.msSaveOrOpenBlob(blob, exportFilename + '.csv');
     } else {
-      const link = document.createElement('a');
+      let link = document.createElement('a');
       link.style.display = 'none';
       document.body.appendChild(link);
       if (link.download !== undefined) {
@@ -991,7 +994,7 @@ export class DataTable
     ColumnHeaderTemplateLoader,
     ColumnBodyTemplateLoader,
     ColumnFooterTemplateLoader,
-    ColumnEditorTemplateLoader
-  ]
+    ColumnEditorTemplateLoader,
+  ],
 })
 export class MomentumTableModule {}

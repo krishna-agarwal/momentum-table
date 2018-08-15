@@ -9,14 +9,14 @@ import {
   OnInit,
   SimpleChanges,
   TemplateRef,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
 import { DataTable } from './datatable';
 import { ColumnComponent } from './columns';
 
 @Component({
   selector: 'm-columnBodyTemplateLoader',
-  template: ``
+  template: ``,
 })
 export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
   @Input() column: any;
@@ -35,8 +35,8 @@ export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
       {
         $implicit: this.column,
         row: this.row,
-        rowIndex: this.rowIndex
-      }
+        rowIndex: this.rowIndex,
+      },
     );
   }
 
@@ -57,7 +57,7 @@ export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
 
 @Component({
   selector: 'm-rowExpansionLoader',
-  template: ``
+  template: ``,
 })
 export class RowExpansionLoader implements OnInit, OnDestroy {
   @Input() template: TemplateRef<any>;
@@ -73,7 +73,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
   ngOnInit() {
     this.view = this.viewContainer.createEmbeddedView(this.template, {
       $implicit: this.rowData,
-      rowIndex: this.rowIndex
+      rowIndex: this.rowIndex,
     });
   }
 
@@ -84,7 +84,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
 
 @Component({
   selector: 'm-emptyTableLoader',
-  template: ``
+  template: ``,
 })
 export class EmptyTableLoader implements OnInit, OnDestroy {
   @Input() template: TemplateRef<any>;
@@ -125,9 +125,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
             </mat-card>
             <m-columnEditorTemplateLoader *ngIf="col.editorTemplate" (click)="$event.stopPropagation()" [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnEditorTemplateLoader>
           </div>
-          <button type="button" (click)="dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex);" mat-icon-button [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'">
-            <span class="material-icons edit-icon m-clickable" >mode_edit</span>
-          </button>
+          <span [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'" class="material-icons edit-icon m-clickable" (click)="dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex);">mode_edit</span>
         </td>
         <td *ngIf="dt.expandable == true">
           <span class="m-expand-icon material-icons" (click)="dt.toggleRow(row, $event)">
@@ -151,73 +149,70 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
   `,
   styles: [
     `
-      * {
-        box-sizing: border-box;
-      }
-      td {
-        position: relative;
-        height: var(--row-height, 48px);
-        border-top: 1px solid var(--table-border-color, #ccc);
-      }
-      tr {
-        transition: all 0.2s;
-      }
-      tr:hover {
-        background: #eeeeee;
-      }
-      td:not(:first-child) {
-        padding: var(--column-padding, 0px 28px);
-      }
-      td:first-child {
-        padding: var(--first-column-padding, 0 0 0 24px);
-      }
-      td:last-child {
-        padding: var(--last-column-padding, 0 24px 0 0);
-      }
-      .m-row-selected {
-        background: var(--row-selection-color, #eee);
-      }
-      .m-expand-icon {
-        font-size: 12px;
-        vertical-align: middle;
-        cursor: pointer;
-        color: #757575;
-      }
-      .m-input-card {
-        background: #f7f7f7;
-        padding: 0px 0px !important;
-        top: 0px !important;
-      }
-      .m-input-form {
-        width: 150px;
-        padding: 0px 12px;
-      }
-      .m-cell-editor {
-        position: absolute !important;
-        z-index: 1000 !important;
-        top: 0 !important;
-      }
-      .m-editable-column > .m-cell-editor {
-        display: none;
-      }
-      .m-editable-column.m-cell-editing > .m-cell-editor {
-        display: block;
-      }
-      .m-editable-column.m-cell-editing > .m-cell-data {
-        visibility: hidden;
-      }
-      .edit-icon {
-        font-size: initial;
-        color: #757575;
-        cursor: pointer;
-      }
-    `
-  ]
+    td{
+      position: relative;
+    }
+    tr {
+      border-top: 1px solid #e0e0e0;
+      height: var(--row-height, 47px);
+      transition: all 0.2s;
+    }
+    tr:hover{
+      background: #EEEEEE;
+    }
+    td:not(:first-child){
+      padding: var(--column-padding, 0px 28px)
+    }
+    td:first-child{
+      padding: var(--first-column-padding, 0 0 0 24px)
+    }
+    td:last-child{
+      padding: var(--last-column-padding, 0 24px 0 0)
+    }
+    .m-row-selected{
+      background: #EEEEEE;
+    }
+    .m-expand-icon{
+      font-size: 12px;
+      vertical-align: middle;
+      cursor: pointer;
+      color: #757575;
+    }
+    .m-input-card{
+      background: #f7f7f7;
+      padding: 0px 0px !important;
+      top: 0px !important;
+    }
+    .m-input-form{
+      width: 150px;
+      padding: 0px 12px;
+    }
+    .m-cell-editor{
+      position: absolute !important;
+      z-index: 1000 !important;
+      top: 0 !important;
+    }
+    .m-editable-column > .m-cell-editor {
+      display: none;
+    }
+    .m-editable-column.m-cell-editing > .m-cell-editor {
+      display: block;
+    }
+    .m-editable-column.m-cell-editing > .m-cell-data {
+      visibility: hidden;
+    }
+    .edit-icon{
+      font-size: initial;
+      color: #757575;
+      cursor: pointer;
+    }
+  `,
+  ],
 })
 export class TableBodyComponent {
   constructor(
     @Inject(forwardRef(() => DataTable))
-    public dt: DataTable
+    public dt: DataTable,
   ) {}
   @Input('mTableBody') columns: ColumnComponent[];
   @Input() value;

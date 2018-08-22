@@ -568,7 +568,7 @@ export class DataTable
 
   findIndexInSelection(rowData: any) {
     let index: number = -1;
-    if (this.selection) {
+    if (this.selection && this.selection.length) {
       for (let i = 0; i < this.selection.length; i++) {
         if (this.equals(rowData, this.selection[i])) {
           index = i;
@@ -600,7 +600,7 @@ export class DataTable
 
   get allSelected() {
     let val = true;
-    if (this.selection) {
+    if (this.selection && this.selection.length) {
       for (const data of this.value) {
         if (!this.isSelected(data)) {
           val = false;

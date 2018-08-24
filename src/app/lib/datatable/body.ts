@@ -232,7 +232,6 @@ export class TableBodyComponent {
     this.hoverCellIndex = hover ? ci : undefined;
   }
   getOffsetStyles(cell) {
-    console.log('Header height', this.headerHeight);
     return {
       'top.px': cell.offsetTop + this.headerHeight,
       left: cell.offsetLeft

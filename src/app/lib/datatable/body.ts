@@ -116,7 +116,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
       <tr (click)="dt.handleRowClick($event, row, rowIndex)" [ngClass]="[dt.isSelected(row)? 'm-row-selected': '']">
         <td *ngIf="dt.selectionHandler == true">
           <div>
-            <mat-checkbox [disableRipple]="true" (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
+            <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
           </div>
         </td>
         <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index;" [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
@@ -225,6 +225,10 @@ export class TableBodyComponent {
   value;
   @Input()
   headerHeight = 0;
+
+  @Input()
+  tableContainerScrollX = 0;
+
   hoverRowIndex;
   hoverCellIndex;
   onHover(ri, ci, hover) {
@@ -234,7 +238,7 @@ export class TableBodyComponent {
   getOffsetStyles(cell) {
     return {
       'top.px': cell.offsetTop + this.headerHeight,
-      left: cell.offsetLeft
+      'left.px': cell.offsetLeft - this.tableContainerScrollX
     };
   }
 }

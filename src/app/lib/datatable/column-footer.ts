@@ -53,9 +53,6 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
   `,
   styles: [
     `
-    td{
-      position: relative;
-    }
     tr {
       text-align: left;
       font-size: 12px;

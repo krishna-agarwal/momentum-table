@@ -50,11 +50,11 @@ import { Subscription } from 'rxjs/Subscription';
   template: `
     <mat-card [ngClass]="{'m-datatable m-widget':true}" [ngStyle]="{'width': width, 'height': height}" class="card-wrapper">
       <div #cardHeader *ngIf="header" [mHeader]="header" (filterChange)="filterChange($event)"></div>
-      <div class="table-container">
+      <div class="table-container" #tableContainer (scroll)="tableContainerScrollX = $event.target.scrollLeft">
         <table>
           <thead [mColumnHeader]="columns"></thead>
           <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>
-          <tbody [headerHeight]="cardHeaderHeight" [mTableBody]="columns" [value]="dataToRender"></tbody>
+          <tbody [tableContainerScrollX]="tableContainerScrollX" [headerHeight]="cardHeaderHeight" [mTableBody]="columns" [value]="dataToRender"></tbody>
         </table>
       </div>
       <div *ngIf="footer" [mFooter]="footer"></div>
@@ -185,7 +185,11 @@ export class DataTable
   @ViewChild('cardHeader', { read: ElementRef })
   cardHeader: ElementRef;
 
+  @ViewChild('tableContainer')
+  tableContainer: ElementRef;
+
   public cardHeaderHeight = 0;
+  public tableContainerScrollX = 0;
 
   public _value: any[];
 
@@ -268,6 +272,7 @@ export class DataTable
   ngAfterViewInit() {
     const el = this.cardHeader.nativeElement as HTMLDivElement;
     this.cardHeaderHeight = el.clientHeight;
+    this.tableContainerScrollX = this.tableContainer.nativeElement.scrollLeft;
     this.changeDetector.detectChanges();
   }
 

@@ -9,21 +9,24 @@ import {
   OnInit,
   SimpleChanges,
   TemplateRef,
-  ViewContainerRef,
+  ViewContainerRef
 } from '@angular/core';
 import { DataTable } from './datatable';
 import { ColumnComponent } from './columns';
 
 @Component({
   selector: 'm-columnBodyTemplateLoader',
-  template: ``,
+  template: ``
 })
 export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
-  @Input() column: any;
+  @Input()
+  column: any;
 
-  @Input() row: any;
+  @Input()
+  row: any;
 
-  @Input() rowIndex: number;
+  @Input()
+  rowIndex: number;
 
   view: EmbeddedViewRef<any>;
 
@@ -35,8 +38,8 @@ export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
       {
         $implicit: this.column,
         row: this.row,
-        rowIndex: this.rowIndex,
-      },
+        rowIndex: this.rowIndex
+      }
     );
   }
 
@@ -57,14 +60,17 @@ export class ColumnBodyTemplateLoader implements OnInit, OnChanges, OnDestroy {
 
 @Component({
   selector: 'm-rowExpansionLoader',
-  template: ``,
+  template: ``
 })
 export class RowExpansionLoader implements OnInit, OnDestroy {
-  @Input() template: TemplateRef<any>;
+  @Input()
+  template: TemplateRef<any>;
 
-  @Input() rowData: any;
+  @Input()
+  rowData: any;
 
-  @Input() rowIndex: any;
+  @Input()
+  rowIndex: any;
 
   view: EmbeddedViewRef<any>;
 
@@ -73,7 +79,7 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
   ngOnInit() {
     this.view = this.viewContainer.createEmbeddedView(this.template, {
       $implicit: this.rowData,
-      rowIndex: this.rowIndex,
+      rowIndex: this.rowIndex
     });
   }
 
@@ -84,10 +90,11 @@ export class RowExpansionLoader implements OnInit, OnDestroy {
 
 @Component({
   selector: 'm-emptyTableLoader',
-  template: ``,
+  template: ``
 })
 export class EmptyTableLoader implements OnInit, OnDestroy {
-  @Input() template: TemplateRef<any>;
+  @Input()
+  template: TemplateRef<any>;
 
   view: EmbeddedViewRef<any>;
 
@@ -108,8 +115,8 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
     <ng-template ngFor let-row [ngForOf]="value" let-even="even" let-odd="odd" let-rowIndex="index">
       <tr (click)="dt.handleRowClick($event, row, rowIndex)" [ngClass]="[dt.isSelected(row)? 'm-row-selected': '']">
         <td *ngIf="dt.selectionHandler == true">
-          <div class="checkbox-container">
-            <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
+          <div>
+            <mat-checkbox [disableRipple]="true" (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
           </div>
         </td>
         <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index;" [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
@@ -117,7 +124,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
           <span class="m-cell-data" *ngIf="col.bodyTemplate">
             <m-columnBodyTemplateLoader [column]="col" [row]="row" [rowIndex]="rowIndex"></m-columnBodyTemplateLoader>
           </span>
-          <div class="m-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable && rowIndex === dt.editRowIndex && colIndex === dt.editCellIndex">
+          <div [ngStyle]="getOffsetStyles(cell)" class="m-cell-editor" (click)="$event.stopPropagation()" *ngIf="col.editable && rowIndex === dt.editRowIndex && colIndex === dt.editCellIndex">
             <mat-card matInput class="m-input-card" *ngIf="!col.editorTemplate">
               <mat-form-field [floatLabel]="'never'" class="m-input-form">
                 <input matInput placeholder="{{col.header}}" [(ngModel)]="row[col.field]" (change)="dt.onCellEditorChange($event, col, row, rowIndex)"
@@ -151,80 +158,83 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
   `,
   styles: [
     `
-    td{
-      position: relative;
-    }
-    tr {
-      border-top: 1px solid #e0e0e0;
-      height: var(--row-height, 47px);
-      transition: all 0.2s;
-    }
-    tr:hover{
-      background: #EEEEEE;
-    }
-    td:not(:first-child){
-      padding: var(--column-padding, 0px 28px)
-    }
-    td:first-child{
-      padding: var(--first-column-padding, 0 0 0 24px)
-    }
-    td:last-child{
-      padding: var(--last-column-padding, 0 24px 0 0)
-    }
-    .m-row-selected{
-      background: #EEEEEE;
-    }
-    .checkbox-container {
-      overflow: hidden;
-    }
-    .m-expand-icon{
-      font-size: 12px;
-      vertical-align: middle;
-      cursor: pointer;
-      color: #757575;
-    }
-    .m-input-card{
-      background: #f7f7f7;
-      padding: 0px 0px !important;
-      top: 0px !important;
-    }
-    .m-input-form{
-      width: 150px;
-      padding: 0px 12px;
-    }
-    .m-cell-editor{
-      position: absolute !important;
-      z-index: 1000 !important;
-      top: 0 !important;
-    }
-    .m-editable-column > .m-cell-editor {
-      display: none;
-    }
-    .m-editable-column.m-cell-editing > .m-cell-editor {
-      display: block;
-    }
-    .m-editable-column.m-cell-editing > .m-cell-data {
-      visibility: hidden;
-    }
-    .edit-icon{
-      font-size: initial;
-      color: #757575;
-      cursor: pointer;
-    }
-  `,
-  ],
+      tr {
+        border-top: 1px solid #e0e0e0;
+        height: var(--row-height, 47px);
+        transition: all 0.2s;
+      }
+      tr:hover {
+        background: #eeeeee;
+      }
+      td:not(:first-child) {
+        padding: var(--column-padding, 0px 28px);
+      }
+      td:first-child {
+        padding: var(--first-column-padding, 0 0 0 24px);
+      }
+      td:last-child {
+        padding: var(--last-column-padding, 0 24px 0 0);
+      }
+      .m-row-selected {
+        background: #eeeeee;
+      }
+      .checkbox-container {
+        overflow: hidden;
+      }
+      .m-expand-icon {
+        font-size: 12px;
+        vertical-align: middle;
+        cursor: pointer;
+        color: #757575;
+      }
+      .m-input-card {
+        background: #f7f7f7;
+        padding: 0px 0px !important;
+        top: 0px !important;
+      }
+      .m-input-form {
+        width: 150px;
+        padding: 0px 12px;
+      }
+      .m-cell-editor {
+        position: absolute !important;
+        z-index: 1000 !important;
+      }
+      .m-editable-column > .m-cell-editor {
+        display: none;
+      }
+      .m-editable-column.m-cell-editing > .m-cell-editor {
+        display: block;
+      }
+      .m-editable-column.m-cell-editing > .m-cell-data {
+        visibility: hidden;
+      }
+      .edit-icon {
+        font-size: initial;
+        color: #757575;
+        cursor: pointer;
+      }
+    `
+  ]
 })
 export class TableBodyComponent {
-  constructor(
-    @Inject(forwardRef(() => DataTable))
-    public dt: DataTable,
-  ) {}
-  @Input('mTableBody') columns: ColumnComponent[];
-  @Input() value;
+  constructor(@Inject(forwardRef(() => DataTable)) public dt: DataTable) {}
+  @Input('mTableBody')
+  columns: ColumnComponent[];
+  @Input()
+  value;
+  @Input()
+  headerHeight = 0;
   hoverRowIndex;
   hoverCellIndex;
   onHover(ri, ci, hover) {
     this.hoverRowIndex = hover ? ri : undefined;
     this.hoverCellIndex = hover ? ci : undefined;
+  }
+  getOffsetStyles(cell) {
+    return {
+      'top.px': cell.offsetTop + this.headerHeight,
+      left: cell.offsetLeft
+    };
   }
 }

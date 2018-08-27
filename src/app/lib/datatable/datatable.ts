@@ -271,7 +271,12 @@ export class DataTable
 
   ngAfterViewInit() {
     const el = this.cardHeader.nativeElement as HTMLDivElement;
-    this.cardHeaderHeight = el.clientHeight;
+    // duping and dumping on DOM se can have the real dimensions.
+    const dupe = this.cardHeader.nativeElement.cloneNode(true);
+    document.body.appendChild(dupe);
+    this.cardHeaderHeight = dupe.clientHeight;
+    // and immediately getting rid of it.
+    document.body.removeChild(dupe);
     this.tableContainerScrollX = this.tableContainer.nativeElement.scrollLeft;
     this.changeDetector.detectChanges();
   }

@@ -41,16 +41,20 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
   template: `
     <tr>
       <th *ngIf="dt.selectionHandler == true" class="m-checkbox-header">
-        <mat-checkbox [disabled]="dt.selectionMode == 'single'" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
+        <div class="m-header-th m-header-th--checkbox">
+          <mat-checkbox [disabled]="dt.selectionMode == 'single'" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
+        </div>
       </th>
       <th [hidden]="col.hidden" *ngFor="let col of columns" (click)="dt.sort($event,col)"
           [ngClass]="[col.colHeadClass ? col.colHeadClass : '', col.sortable ? 'm-sortable-column': '']">
-        <span *ngIf="!col.headerTemplate">{{ col.header }}</span>
-        <span *ngIf="col.headerTemplate">
-          <m-columnHeaderTemplateLoader [column]="col"></m-columnHeaderTemplateLoader>
-        </span>
-        <span class="m-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == -1">arrow_downward</span>
-        <span class="m-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == 1">arrow_upward</span>
+        <div class="m-header-th">
+          <span *ngIf="!col.headerTemplate">{{ col.header }}</span>
+          <span *ngIf="col.headerTemplate">
+            <m-columnHeaderTemplateLoader [column]="col"></m-columnHeaderTemplateLoader>
+          </span>
+          <span class="m-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == -1">arrow_downward</span>
+          <span class="m-sortable-column-icon material-icons" *ngIf="dt.getSortOrder(col) == 1">arrow_upward</span>
+        </div>
       </th>
       <th *ngIf="dt.expandable == true" class="m-expand-header">
       </th>
@@ -83,7 +87,6 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
     }
     .m-checkbox-header, .m-expand-header{
       width: 1%;
-      white-space: nowrap;
     }
     .m-sortable-column {
       cursor: pointer;

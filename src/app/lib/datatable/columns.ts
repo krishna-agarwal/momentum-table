@@ -50,6 +50,7 @@ export class ColumnEditorTemplateLoader implements OnInit, OnDestroy {
 export class ColumnComponent implements AfterContentInit {
   @Input() field: string;
   @Input() header: string;
+  @Input() subHeader: string;
   @Input() footer: string;
   @Input() sortable: boolean;
   @Input() editable: boolean;
@@ -62,6 +63,7 @@ export class ColumnComponent implements AfterContentInit {
   @ContentChildren(MomentumTemplate) templates: QueryList<any>;
 
   public headerTemplate: TemplateRef<any>;
+  public subHeaderTemplate: TemplateRef<any>;
   public bodyTemplate: TemplateRef<any>;
   public footerTemplate: TemplateRef<any>;
   public editorTemplate: TemplateRef<any>;
@@ -73,6 +75,10 @@ export class ColumnComponent implements AfterContentInit {
       switch (item.getType()) {
         case 'header':
           this.headerTemplate = item.template;
+          break;
+
+        case 'subHeader':
+          this.subHeaderTemplate = item.template;
           break;
 
         case 'body':

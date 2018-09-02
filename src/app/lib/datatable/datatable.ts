@@ -39,6 +39,10 @@ import {
   ColumnHeaderTemplateLoader
 } from './column-header';
 import {
+  ColumnSubHeaderComponent,
+  ColumnSubHeaderTemplateLoader
+} from './column-sub-header';
+import {
   ColumnFooterComponent,
   ColumnFooterTemplateLoader
 } from './column-footer';
@@ -53,6 +57,7 @@ import { Subscription } from 'rxjs/Subscription';
       <div class="table-container" #tableContainer (scroll)="tableContainerScrollX = $event.target.scrollLeft">
         <table>
           <thead [mColumnHeader]="columns"></thead>
+          <thead [mColumnSubHeader]="columns" *ngIf="hasSubFooter()"></thead>
           <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>
           <tbody [tableContainerScrollX]="tableContainerScrollX" [headerHeight]="cardHeaderHeight" [mTableBody]="columns" [value]="dataToRender"></tbody>
         </table>
@@ -270,15 +275,17 @@ export class DataTable
   }
 
   ngAfterViewInit() {
-    const el = this.cardHeader.nativeElement as HTMLDivElement;
-    // duping and dumping on DOM se can have the real dimensions.
-    const dupe = this.cardHeader.nativeElement.cloneNode(true);
-    document.body.appendChild(dupe);
-    this.cardHeaderHeight = dupe.clientHeight;
-    // and immediately getting rid of it.
-    document.body.removeChild(dupe);
-    this.tableContainerScrollX = this.tableContainer.nativeElement.scrollLeft;
-    this.changeDetector.detectChanges();
+    if (this.cardHeader) {
+      const el = this.cardHeader.nativeElement as HTMLDivElement;
+      // duping and dumping on DOM se can have the real dimensions.
+      const dupe = el.cloneNode(true) as HTMLDivElement;
+      document.body.appendChild(dupe);
+      this.cardHeaderHeight = dupe.clientHeight;
+      // and immediately getting rid of it.
+      document.body.removeChild(dupe);
+      this.tableContainerScrollX = this.tableContainer.nativeElement.scrollLeft;
+      this.changeDetector.detectChanges();
+    }
   }
 
   filterChange(event: any) {
@@ -432,6 +439,17 @@ export class DataTable
     if (this.columns) {
       for (let i = 0; i < this.columns.length; i++) {
         if (this.columns[i].footer || this.columns[i].footerTemplate) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  hasSubFooter() {
+    if (this.columns) {
+      for (let i = 0; i < this.columns.length; i++) {
+        if (this.columns[i].subHeader || this.columns[i].subHeaderTemplate) {
           return true;
         }
       }
@@ -1035,12 +1053,14 @@ export class DataTable
     HeaderComponent,
     FooterComponent,
     ColumnHeaderComponent,
+    ColumnSubHeaderComponent,
     ColumnFooterComponent,
     TableBodyComponent,
     EmptyTableLoader,
     RowExpansionLoader,
     MomentumTemplate,
     GlobalHeaderTemplateLoader,
+    ColumnSubHeaderTemplateLoader,
     GlobalFooterTemplateLoader,
     Header,
     Footer,

@@ -24,11 +24,12 @@
 
   <m-column field="capital" header="Capital" [sortable]="true"></m-column>
 
-  <m-column field="continent" header="Continent" [sortable]="true"></m-column>
+  <m-column field="continent" header="Continent" [sortable]="true">
+  </m-column>
 
   <m-column field="flag" header="flag" [sortable]="true" [editable]="true">
     <ng-template let-col mTemplate="header">
-      <button type="button" (click)="flagHeaderClick(col)">Falg</button>
+      <button type="button" (click)="flagHeaderClick(col)">Flag</button>
     </ng-template>
 
     <ng-template let-col let-row="row" mTemplate="body">

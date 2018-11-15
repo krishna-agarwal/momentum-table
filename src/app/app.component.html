@@ -16,7 +16,11 @@
       </div>
     </ng-template> -->
   </m-header>
-  <m-footer [paginator]="true" [pageSize]="5"></m-footer>
+  <m-footer [paginator]="true" [pageSize]="5">
+    <!--<ng-template let-footer>-->
+      <!--<div>World</div>-->
+    <!--</ng-template>-->
+  </m-footer>
 
   <m-column field="country" header="Country" [sortable]="true" [editable]="true" [editTrigger]="'button'" [colHeadClass]="'country-header-class'"></m-column>
 

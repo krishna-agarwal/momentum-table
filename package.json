@@ -1,6 +1,6 @@
 {
   "name": "momentum-table",
-  "version": "1.4.0",
+  "version": "1.5.1",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -30,7 +30,6 @@
     "filter",
     "sort",
     "pagination"
-
   ],
   "homepage": "https://github.com/krishna-agarwal/momentum-table",
   "peerDependencies": {

@@ -49,6 +49,14 @@ export class AppComponent implements OnInit{
     // }, 2000);
   }
 
+  onColDelete(event) {
+    console.log(event);
+  }
+
+  onColReset(event) {
+    console.log(event);
+  }
+
   rowClick(event) {
     console.log('click', event);
   }

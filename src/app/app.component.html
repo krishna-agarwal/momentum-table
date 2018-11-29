@@ -7,6 +7,8 @@
          (valueChange)="valueChange($event)"
          (onFilter)="onFilter($event)" [filterLocal]="true"
          (onReload)="tableReload()"
+         (onColumnDelete)="onColDelete($event)"
+         (onColumnReset)="onColReset($event)"
          (onPage)="onPage($event)">
 
   <m-header title="Countries" [globalSearch]="true" [searchField]="'box'" [colSetting]="true" [reload]="true" [export]="true">
@@ -26,9 +28,9 @@
 
   <m-column field="population" header="Population" [sortable]="true" [editable]="true" [colHeadClass]="'align-right'" [colBodyClass]="'align-right'"></m-column>
 
-  <m-column field="capital" header="Capital" [sortable]="true"></m-column>
+  <m-column field="capital" header="Capital" [colBodyClass]="'inline-column'" [sortable]="true" [editable]="true" [editTrigger]="'button'" [deletable]="true"></m-column>
 
-  <m-column field="continent" header="Continent" [sortable]="true">
+  <m-column field="continent" header="Continent" [sortable]="true" [editable]="true" [resettable]="true">
   </m-column>
 
   <m-column field="flag" header="flag" [sortable]="true" [editable]="true">

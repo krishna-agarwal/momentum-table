@@ -2,6 +2,10 @@
   min-width: 200px !important;
 }
 
+:host ::ng-deep .inline-column{
+  white-space: nowrap !important;
+}
+
 :host ::ng-deep .align-right{
   text-align: right;
 }

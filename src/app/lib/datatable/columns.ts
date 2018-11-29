@@ -55,6 +55,8 @@ export class ColumnComponent implements AfterContentInit {
   @Input() sortable: boolean;
   @Input() editable: boolean;
   @Input() editTrigger: string = 'cell';
+  @Input() deletable: boolean;
+  @Input() resettable: boolean;
   @Input() hidden: boolean;
   @Input() frozen: boolean;
   @Input() colHeadClass: any;

@@ -161,6 +161,12 @@ export class DataTable
   onEditCancel: EventEmitter<any> = new EventEmitter();
 
   @Output()
+  onColumnDelete: EventEmitter<any> = new EventEmitter();
+
+  @Output()
+  onColumnReset: EventEmitter<any> = new EventEmitter();
+
+  @Output()
   valueChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
   @Output()
@@ -965,6 +971,26 @@ export class DataTable
 
   public reload() {
     this.onReload.emit();
+  }
+
+  public columnDelete(event, col, row, rowIndex, colIndex) {
+    this.onColumnDelete.emit({
+      column: col,
+      data: row,
+      rowIndex: rowIndex,
+      colIndex: colIndex
+    });
+    event.stopPropagation();
+  }
+
+  public columnReset(event, col, row, rowIndex, colIndex) {
+    this.onColumnReset.emit({
+      column: col,
+      data: row,
+      rowIndex: rowIndex,
+      colIndex: colIndex
+    });
+    event.stopPropagation();
   }
 
   public exportCSV(

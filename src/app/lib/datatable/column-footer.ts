@@ -41,7 +41,7 @@ export class ColumnFooterTemplateLoader implements OnInit, OnDestroy {
     <tr>
       <td *ngIf="dt.selectionHandler == true">
       </td>
-      <td [hidden]="col.hidden" *ngFor="let col of columns; trackBy: trackByIndex;">
+      <td [hidden]="col.hidden" *ngFor="let col of columns;">
         <span *ngIf="!col.footerTemplate">{{ col.footer }}</span>
         <span *ngIf="col.footerTemplate">
           <m-columnFooterTemplateLoader [column]="col"></m-columnFooterTemplateLoader>
@@ -81,8 +81,4 @@ export class ColumnFooterComponent {
     public dt: DataTable,
   ) {}
   @Input('mColumnFooter') columns: ColumnComponent[];
-
-  trackByIndex(index, item) {
-    return index;
-  }
 }

@@ -45,7 +45,7 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
           <mat-checkbox [disabled]="dt.selectionMode == 'single'" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
         </div>
       </th>
-      <th [hidden]="col.hidden" *ngFor="let col of columns; trackBy: trackByIndex;" (click)="dt.sort($event,col)"
+      <th [hidden]="col.hidden" *ngFor="let col of columns;" (click)="dt.sort($event,col)"
           [ngClass]="[col.colHeadClass ? col.colHeadClass : '', col.sortable ? 'm-sortable-column': '']">
         <div class="m-header-th">
           <span *ngIf="!col.headerTemplate">{{ col.header }}</span>
@@ -106,7 +106,4 @@ export class ColumnHeaderComponent {
   ) {}
   @Input('mColumnHeader') columns: ColumnComponent[];
 
-  trackByIndex(index, item) {
-    return index;
-  }
 }

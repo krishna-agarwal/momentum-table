@@ -42,7 +42,7 @@ export class ColumnSubHeaderTemplateLoader implements OnInit, OnDestroy {
     <tr>
       <td *ngIf="dt.selectionHandler == true">
       </td>
-      <td [hidden]="col.hidden" *ngFor="let col of columns; trackBy: trackByIndex;"
+      <td [hidden]="col.hidden" *ngFor="let col of columns;"
           [ngClass]="[col.colSubHeadClass ? col.colSubHeadClass : '']">
         <span *ngIf="!col.subHeaderTemplate">{{ col.subHeader }}</span>
         <span *ngIf="col.subHeaderTemplate">
@@ -84,7 +84,4 @@ export class ColumnSubHeaderComponent {
   ) {}
   @Input('mColumnSubHeader') columns: ColumnComponent[];
 
-  trackByIndex(index, item) {
-    return index;
-  }
 }

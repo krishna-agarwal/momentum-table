@@ -112,14 +112,14 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
 @Component({
   selector: '[mTableBody]',
   template: `
-    <ng-template ngFor let-row [ngForOf]="value" [ngForTrackBy]="trackByIndex" let-even="even" let-odd="odd" let-rowIndex="index">
+    <ng-template ngFor let-row [ngForOf]="value" let-even="even" let-odd="odd" let-rowIndex="index">
       <tr (click)="dt.handleRowClick($event, row, rowIndex)" [ngClass]="[dt.isSelected(row)? 'm-row-selected': '']">
         <td *ngIf="dt.selectionHandler == true">
           <div class="m-body-td m-body-td--checkbox">
             <mat-checkbox (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
           </div>
         </td>
-        <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns;trackBy: trackByIndex; let colIndex = index"  [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
+        <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index"  [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
             <div class="m-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'m-clickable':col.editable && col.editTrigger !== 'button'}">
               {{row[col.field]}}
               <button type="button" mat-icon-button [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'" class="action-icon m-clickable" (click)="dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex);"><mat-icon class="m-clickable">mode_edit</mat-icon></button>
@@ -247,10 +247,6 @@ export class TableBodyComponent {
 
   hoverRowIndex;
   hoverCellIndex;
-
-  trackByIndex(index, item) {
-    return index;
-  }
 
   onHover(ri, ci, hover) {
     this.hoverRowIndex = hover ? ri : undefined;

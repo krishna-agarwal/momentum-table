@@ -42,7 +42,7 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
     <tr>
       <th *ngIf="dt.selectionHandler == true" class="m-checkbox-header">
         <div class="m-header-th m-header-th--checkbox">
-          <mat-checkbox [disabled]="dt.selectionMode == 'single'" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
+          <mat-checkbox [disabled]="dt.selectionMode === 'single' || dt.disableSelectAll" [checked]="dt.allSelected" (change)="dt.toggleRowsWithCheckbox($event)"></mat-checkbox>
         </div>
       </th>
       <th [hidden]="col.hidden" *ngFor="let col of columns;" (click)="dt.sort($event,col)"

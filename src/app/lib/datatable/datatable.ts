@@ -116,6 +116,12 @@ export class DataTable
   selectable: boolean;
 
   @Input()
+  rowSelectableKey: string;
+
+  @Input()
+  disableSelectAll = false;
+
+  @Input()
   selectionMode = 'multiple';
 
   @Input()

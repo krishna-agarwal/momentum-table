@@ -110,16 +110,46 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
 }
 
 @Component({
+  selector: 'm-rowSettingsLoader',
+  template: ``
+})
+export class RowSettingsLoader implements OnInit, OnDestroy {
+  @Input()
+  template: TemplateRef<any>;
+
+  @Input()
+  rowData: any;
+
+  @Input()
+  rowIndex: any;
+
+  view: EmbeddedViewRef<any>;
+
+  constructor(public viewContainer: ViewContainerRef) {}
+
+  ngOnInit() {
+    this.view = this.viewContainer.createEmbeddedView(this.template, {
+      $implicit: this.rowData,
+      rowIndex: this.rowIndex
+    });
+  }
+
+  ngOnDestroy() {
+    this.view.destroy();
+  }
+}
+
+@Component({
   selector: '[mTableBody]',
   template: `
     <ng-template ngFor let-row [ngForOf]="value" let-even="even" let-odd="odd" let-rowIndex="index">
-      <tr (click)="dt.handleRowClick($event, row, rowIndex)" [ngClass]="[dt.isSelected(row)? 'm-row-selected': '']">
+      <tr (click)="dt.handleRowClick($event, row, rowIndex)" (mouseenter)="onRowHover(rowIndex, true)" (mouseleave)="onRowHover(rowIndex, false)" [ngClass]="[dt.isSelected(row)? 'm-row-selected': '']">
         <td *ngIf="dt.selectionHandler == true">
           <div class="m-body-td m-body-td--checkbox">
             <mat-checkbox [disabled]="row[dt.rowSelectableKey] !== undefined && row[dt.rowSelectableKey] === false" (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
           </div>
         </td>
-        <td #cell (mouseenter)="onHover(rowIndex, colIndex, true)" (mouseleave)="onHover(rowIndex, colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index"  [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
+        <td #cell (mouseenter)="onHover(colIndex, true)" (mouseleave)="onHover(colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index"  [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
             <div class="m-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'m-clickable':col.editable && col.editTrigger !== 'button'}">
               {{row[col.field]}}
               <button type="button" mat-icon-button [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'" class="action-icon m-clickable" (click)="dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex);"><mat-icon class="m-clickable">mode_edit</mat-icon></button>
@@ -150,6 +180,9 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
             <i class="material-icons m-clickable" *ngIf="dt.isRowExpanded(row)">keyboard_arrow_down</i>
           </span>
         </td>
+        <div class="row-settings" *ngIf="dt.rowSettingsTemplate && hoverRowIndex === rowIndex">
+          <m-rowSettingsLoader [rowData]="row" [rowIndex]="rowIndex" [template]="dt.rowSettingsTemplate"></m-rowSettingsLoader>
+        </div>
       </tr>
       <tr *ngIf="dt.expandable && dt.isRowExpanded(row)" class="m-expanded-row-content">
         <td [attr.colspan]="dt.totalColumns()">
@@ -180,7 +213,7 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
       td:first-child {
         padding: var(--first-column-padding, 0 0 0 24px);
       }
-      td:last-child {
+      td:last-of-type  {
         padding: var(--last-column-padding, 0 24px 0 0);
       }
       .m-row-selected {
@@ -230,6 +263,14 @@ export class EmptyTableLoader implements OnInit, OnDestroy {
       .action-icon mat-icon {
         font-size: 16px;
       }
+      .row-settings {
+        height: calc(var(--row-height, 48px) - 1px);
+        background: linear-gradient(to right, #eeeeeef0, #eeeeee);
+        position: absolute;
+        right: 0;
+        padding: 0 1rem;
+        line-height: calc(var(--row-height, 48px) - 1px);
+      }
     `
   ]
 })
@@ -248,9 +289,12 @@ export class TableBodyComponent {
   hoverRowIndex;
   hoverCellIndex;
 
-  onHover(ri, ci, hover) {
-    this.hoverRowIndex = hover ? ri : undefined;
+  onHover(ci, hover) {
     this.hoverCellIndex = hover ? ci : undefined;
+  }
+
+  onRowHover(ri, hover) {
+    this.hoverRowIndex = hover ? ri : undefined;
   }
   getOffsetStyles(cell) {
     return {

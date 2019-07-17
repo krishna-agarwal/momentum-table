@@ -29,7 +29,7 @@ import { ColumnComponent, ColumnEditorTemplateLoader } from './columns';
 import {
   ColumnBodyTemplateLoader,
   EmptyTableLoader,
-  RowExpansionLoader,
+  RowExpansionLoader, RowSettingsLoader,
   TableBodyComponent
 } from './body';
 import { GlobalHeaderTemplateLoader, Header, HeaderComponent } from './header';
@@ -228,6 +228,8 @@ export class DataTable
 
   public emptyTableTemplate: TemplateRef<any>;
 
+  public rowSettingsTemplate: TemplateRef<any>;
+
   public editorClick: boolean;
 
   public editingCell: any;
@@ -281,6 +283,9 @@ export class DataTable
           break;
         case 'emptyTable':
           this.emptyTableTemplate = item.template;
+          break;
+        case 'rowSettings':
+          this.rowSettingsTemplate = item.template;
           break;
       }
     });
@@ -1089,6 +1094,7 @@ export class DataTable
     ColumnFooterComponent,
     TableBodyComponent,
     EmptyTableLoader,
+    RowSettingsLoader,
     RowExpansionLoader,
     MomentumTemplate,
     GlobalHeaderTemplateLoader,

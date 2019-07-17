@@ -142,4 +142,9 @@ export class AppComponent implements OnInit{
     //   ];
     // }, 2000);
   }
+
+  // settingSearch(event, row) {
+  //   console.log(row);
+  //   event.stopPropagation();
+  // }
 }

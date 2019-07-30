@@ -181,6 +181,9 @@ export class DataTable
   @Input()
   filterLocal = true;
 
+  @Input()
+  locale: any = {};
+
   @Output()
   onReload: EventEmitter<string> = new EventEmitter();
 

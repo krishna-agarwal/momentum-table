@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ContentChild,
   EmbeddedViewRef,
@@ -9,10 +10,11 @@ import {
   OnDestroy,
   OnInit,
   SimpleChanges,
-  TemplateRef,
+  TemplateRef, ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import { DataTable } from './datatable';
+import { MatPaginator } from '@angular/material';
 
 @Component({
   selector: 'm-footer',
@@ -87,12 +89,24 @@ export class GlobalFooterTemplateLoader
       float: right;
     }
   `,
-  ],
+  ]
 })
-export class FooterComponent {
+export class FooterComponent implements AfterViewInit {
   @Input('mFooter') footer: Footer;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+
   constructor(
     @Inject(forwardRef(() => DataTable))
     public dt: DataTable,
   ) {}
+
+  ngAfterViewInit() {
+    if (this.dt.locale.paginator) {
+      const { itemsPerPageLabel, nextPageLabel, previousPageLabel } = this.dt.locale.paginator;
+      itemsPerPageLabel ? this.paginator._intl.itemsPerPageLabel = itemsPerPageLabel : null;
+      nextPageLabel ? this.paginator._intl.nextPageLabel = nextPageLabel : null;
+      previousPageLabel ? this.paginator._intl.previousPageLabel = previousPageLabel : null;
+    }
+
+  }
 }

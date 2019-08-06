@@ -1033,12 +1033,10 @@ export class DataTable
     for (let i = 0; i < this.columns.length; i++) {
       if (this.columns[i].field) {
         csv += '"' + (this.columns[i].header || this.columns[i].field) + '"';
-
-        if (i < this.columns.length - 1) {
-          csv += csvSeparator;
-        }
+        csv += csvSeparator;
       }
     }
+    csv = csv.slice(0, -1);
 
     // body
     data.forEach((record, i) => {
@@ -1047,12 +1045,11 @@ export class DataTable
         if (this.columns[i].field) {
           csv +=
             '"' + this.resolveFieldData(record, this.columns[i].field) + '"';
+          csv += csvSeparator;
 
-          if (i < this.columns.length - 1) {
-            csv += csvSeparator;
-          }
         }
       }
+      csv = csv.slice(0, -1);
     });
 
     const blob = new Blob([csv], {

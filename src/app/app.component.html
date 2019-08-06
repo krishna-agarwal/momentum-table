@@ -34,7 +34,7 @@
   <m-column field="continent" header="Continent" [sortable]="true" [editable]="true" [resettable]="true">
   </m-column>
 
-  <m-column field="flag" header="flag" [sortable]="true" [editable]="true">
+  <m-column  header="flag" [sortable]="true" [editable]="true">
     <ng-template let-col mTemplate="header">
       <button type="button" (click)="flagHeaderClick(col)">Flag</button>
     </ng-template>

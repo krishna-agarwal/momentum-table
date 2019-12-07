@@ -56,7 +56,7 @@ import { Subscription } from 'rxjs/Subscription';
       <div #cardHeader *ngIf="header" [mHeader]="header" (filterChange)="filterChange($event)"></div>
       <div class="table-container" #tableContainer (scroll)="tableContainerScrollX = $event.target.scrollLeft">
         <table>
-          <thead [mColumnHeader]="columns"></thead>
+          <thead #columnHeader class="column-header" [mColumnHeader]="columns"></thead>
           <thead [mColumnSubHeader]="columns" *ngIf="hasSubFooter()"></thead>
           <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>
           <tbody [tableContainerScrollX]="tableContainerScrollX" [headerHeight]="cardHeaderHeight" [mTableBody]="columns" [value]="dataToRender"></tbody>
@@ -184,6 +184,9 @@ export class DataTable
   @Input()
   locale: any = {};
 
+  @Input()
+  fixHeader: number;
+
   @Output()
   onReload: EventEmitter<string> = new EventEmitter();
 
@@ -207,6 +210,9 @@ export class DataTable
 
   @ViewChild('tableContainer')
   tableContainer: ElementRef;
+
+  @ViewChild('columnHeader', { read: ElementRef })
+  columnHeader: ElementRef;
 
   public cardHeaderHeight = 0;
   public tableContainerScrollX = 0;
@@ -306,7 +312,48 @@ export class DataTable
       this.tableContainerScrollX = this.tableContainer.nativeElement.scrollLeft;
       this.changeDetector.detectChanges();
     }
+
+    if (this.fixHeader !== undefined) {
+      this.fixedHeaderScroll(Array.from(this.columnHeader.nativeElement.children[0].children), this.fixHeader);
+    }
+
   }
+
+  fixedHeaderScroll(elemsToFixed: HTMLHeadingElement[], threshold: number) {
+    if (!elemsToFixed || elemsToFixed.length === 0) {
+      return;
+    }
+    // We assume that all of the elements are on the same height.
+    const firstEl = elemsToFixed[0];
+    let propSet = false;
+    window.addEventListener('scroll', (e) => {
+      window.requestAnimationFrame(() => {
+        const top = firstEl.parentElement!.getBoundingClientRect().top;
+        if (top > threshold) {
+          if (!propSet) return;
+          propSet = false;
+          this.setElemsFixed(elemsToFixed, top, threshold, false);
+          return;
+        }
+        propSet = true;
+        this.setElemsFixed(elemsToFixed, top, threshold);
+      });
+    });
+  }
+
+  setElemsFixed(elemsToFixed: HTMLHeadingElement[], top: number,
+                         threshold: number, setFixed = true) {
+    elemsToFixed.forEach((elem) => {
+      if (!setFixed) {
+        elem.removeAttribute('style');
+        elem.classList.remove('fixed-header');
+        return;
+      }
+      elem.classList.add('fixed-header');
+      elem.style.setProperty('--translate', `translateY(${((top - threshold) * -1)}px)`);
+    });
+  }
+
 
   filterChange(event: any) {
     this.globalFilterString = event.value;

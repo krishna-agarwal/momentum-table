@@ -48,6 +48,7 @@ import {
 } from './column-footer';
 import { MomentumTemplate } from './template.directive';
 import { Subscription } from 'rxjs/Subscription';
+import { Overlay } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'm-table',
@@ -264,13 +265,15 @@ export class DataTable
 
   verticalScrollHandler;
   propSet = false;
+  overlayRef;
 
   constructor(
     public domHandler: DomHandler,
     public objectUtils: ObjectUtils,
     public renderer: Renderer2,
     public differs: IterableDiffers,
-    public changeDetector: ChangeDetectorRef
+    public changeDetector: ChangeDetectorRef,
+    private overlay: Overlay
   ) {
     this.differ = differs.find([]).create(null);
   }
@@ -322,12 +325,11 @@ export class DataTable
     }
     scrollElement.removeEventListener('scroll', this.verticalScrollHandler);
     this.verticalScrollHandler = this.headScrollFn.bind(this, threshold, elemsToFixed);
-    scrollElement.addEventListener('scroll', this.verticalScrollHandler);
+    scrollElement.addEventListener('scroll', this.verticalScrollHandler, true);
   }
 
   headScrollFn(threshold, elemsToFixed) {
     const firstEl = elemsToFixed[0];
-    // let propSet = false;
     window.requestAnimationFrame(() => {
       const top = firstEl.parentElement!.getBoundingClientRect().top;
       if (top > threshold) {
@@ -347,7 +349,14 @@ export class DataTable
       if (!setFixed) {
         elem.removeAttribute('style');
         elem.classList.remove('fixed-header');
+        if (this.overlayRef) {
+          this.overlayRef.dispose();
+          this.overlayRef = undefined;
+        }
         return;
+      }
+      if (!this.overlayRef) {
+        this.overlayRef = this.overlay.create();
       }
       elem.classList.add('fixed-header');
       elem.style.setProperty('--translate', `translateY(${((top - threshold) * -1)}px)`);

@@ -89,7 +89,7 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
       transform: var(--translate);
       position: relative;
       box-shadow: rgb(224, 224, 224) 0 2px 0 0;
-      transition-timing-function: ease-in-out;
+      transition-timing-function: ease-in;
     }
     .m-checkbox-header, .m-expand-header{
       width: 1%;

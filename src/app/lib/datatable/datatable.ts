@@ -184,9 +184,6 @@ export class DataTable
   @Input()
   locale: any = {};
 
-  @Input()
-  fixHeader: number;
-
   @Output()
   onReload: EventEmitter<string> = new EventEmitter();
 
@@ -265,6 +262,9 @@ export class DataTable
 
   columnsSubscription$: Subscription;
 
+  verticalScrollHandler;
+  propSet = false;
+
   constructor(
     public domHandler: DomHandler,
     public objectUtils: ObjectUtils,
@@ -313,31 +313,31 @@ export class DataTable
       this.changeDetector.detectChanges();
     }
 
-    if (this.fixHeader !== undefined) {
-      this.fixedHeaderScroll(Array.from(this.columnHeader.nativeElement.children[0].children), this.fixHeader);
-    }
-
   }
 
-  fixedHeaderScroll(elemsToFixed: HTMLHeadingElement[], threshold: number) {
+  public fixHeader(scrollElement, threshold) {
+    const elemsToFixed = Array.from(this.columnHeader.nativeElement.children[0].children);
     if (!elemsToFixed || elemsToFixed.length === 0) {
       return;
     }
-    // We assume that all of the elements are on the same height.
+    scrollElement.removeEventListener('scroll', this.verticalScrollHandler);
+    this.verticalScrollHandler = this.headScrollFn.bind(this, threshold, elemsToFixed);
+    scrollElement.addEventListener('scroll', this.verticalScrollHandler);
+  }
+
+  headScrollFn(threshold, elemsToFixed) {
     const firstEl = elemsToFixed[0];
-    let propSet = false;
-    window.addEventListener('scroll', (e) => {
-      window.requestAnimationFrame(() => {
-        const top = firstEl.parentElement!.getBoundingClientRect().top;
-        if (top > threshold) {
-          if (!propSet) return;
-          propSet = false;
-          this.setElemsFixed(elemsToFixed, top, threshold, false);
-          return;
-        }
-        propSet = true;
-        this.setElemsFixed(elemsToFixed, top, threshold);
-      });
+    // let propSet = false;
+    window.requestAnimationFrame(() => {
+      const top = firstEl.parentElement!.getBoundingClientRect().top;
+      if (top > threshold) {
+        if (!this.propSet) return;
+        this.propSet = false;
+        this.setElemsFixed(elemsToFixed, top, threshold, false);
+        return;
+      }
+      this.propSet = true;
+      this.setElemsFixed(elemsToFixed, top, threshold);
     });
   }
 

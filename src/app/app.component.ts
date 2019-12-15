@@ -1,21 +1,23 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {DataTable} from "./lib/datatable/datatable";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit, AfterViewInit {
   selectedRows;
   countries;
   emptyMsg: string = 'loading...';
   pageIndex: number = 0;
   totalRecord: number = 13;
-  constructor() {
 
-  }
+  @ViewChild(DataTable)
+  table: DataTable;
+  constructor() {}
 
-  ngOnInit(){
+  ngOnInit() {
     setTimeout( () => {
       this.countries = [
         {'country': 'Afghanistan', 'selectable': false, 'population': 35530081, 'capital': 'Kabul', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Afghanistan.jpg'},
@@ -47,6 +49,11 @@ export class AppComponent implements OnInit{
     //     {'country': 'Iraq', 'population': 38274618, 'capital': 'Baghdad', 'continent': 'Asia', 'flag': 'http://www.sciencekids.co.nz/images/pictures/flags96/Iraq.jpg'},
     //   ];
     // }, 2000);
+  }
+
+  ngAfterViewInit() {
+    // for fix headers
+    // this.table.fixHeader(window, 0);
   }
 
   onColDelete(event) {

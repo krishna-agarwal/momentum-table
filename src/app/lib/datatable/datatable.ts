@@ -48,6 +48,7 @@ import {
 } from './column-footer';
 import { MomentumTemplate } from './template.directive';
 import { Subscription } from 'rxjs/Subscription';
+import { Overlay } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'm-table',
@@ -56,7 +57,7 @@ import { Subscription } from 'rxjs/Subscription';
       <div #cardHeader *ngIf="header" [mHeader]="header" (filterChange)="filterChange($event)"></div>
       <div class="table-container" #tableContainer (scroll)="tableContainerScrollX = $event.target.scrollLeft">
         <table>
-          <thead [mColumnHeader]="columns"></thead>
+          <thead #columnHeader class="column-header" [mColumnHeader]="columns"></thead>
           <thead [mColumnSubHeader]="columns" *ngIf="hasSubFooter()"></thead>
           <tfoot [mColumnFooter]="columns" *ngIf="hasFooter()"></tfoot>
           <tbody [tableContainerScrollX]="tableContainerScrollX" [headerHeight]="cardHeaderHeight" [mTableBody]="columns" [value]="dataToRender"></tbody>
@@ -208,6 +209,9 @@ export class DataTable
   @ViewChild('tableContainer')
   tableContainer: ElementRef;
 
+  @ViewChild('columnHeader', { read: ElementRef })
+  columnHeader: ElementRef;
+
   public cardHeaderHeight = 0;
   public tableContainerScrollX = 0;
 
@@ -259,12 +263,17 @@ export class DataTable
 
   columnsSubscription$: Subscription;
 
+  verticalScrollHandler;
+  propSet = false;
+  overlayRef;
+
   constructor(
     public domHandler: DomHandler,
     public objectUtils: ObjectUtils,
     public renderer: Renderer2,
     public differs: IterableDiffers,
-    public changeDetector: ChangeDetectorRef
+    public changeDetector: ChangeDetectorRef,
+    private overlay: Overlay
   ) {
     this.differ = differs.find([]).create(null);
   }
@@ -306,7 +315,54 @@ export class DataTable
       this.tableContainerScrollX = this.tableContainer.nativeElement.scrollLeft;
       this.changeDetector.detectChanges();
     }
+
   }
+
+  public fixHeader(scrollElement, threshold) {
+    const elemsToFixed = Array.from(this.columnHeader.nativeElement.children[0].children);
+    if (!elemsToFixed || elemsToFixed.length === 0) {
+      return;
+    }
+    scrollElement.removeEventListener('scroll', this.verticalScrollHandler);
+    this.verticalScrollHandler = this.headScrollFn.bind(this, threshold, elemsToFixed);
+    scrollElement.addEventListener('scroll', this.verticalScrollHandler, true);
+  }
+
+  headScrollFn(threshold, elemsToFixed) {
+    const firstEl = elemsToFixed[0];
+    window.requestAnimationFrame(() => {
+      const top = firstEl.parentElement!.getBoundingClientRect().top;
+      if (top > threshold) {
+        if (!this.propSet) return;
+        this.propSet = false;
+        this.setElemsFixed(elemsToFixed, top, threshold, false);
+        return;
+      }
+      this.propSet = true;
+      this.setElemsFixed(elemsToFixed, top, threshold);
+    });
+  }
+
+  setElemsFixed(elemsToFixed: HTMLHeadingElement[], top: number,
+                         threshold: number, setFixed = true) {
+    elemsToFixed.forEach((elem) => {
+      if (!setFixed) {
+        elem.removeAttribute('style');
+        elem.classList.remove('fixed-header');
+        if (this.overlayRef) {
+          this.overlayRef.dispose();
+          this.overlayRef = undefined;
+        }
+        return;
+      }
+      if (!this.overlayRef) {
+        this.overlayRef = this.overlay.create();
+      }
+      elem.classList.add('fixed-header');
+      elem.style.setProperty('--translate', `translateY(${((top - threshold) * -1)}px)`);
+    });
+  }
+
 
   filterChange(event: any) {
     this.globalFilterString = event.value;

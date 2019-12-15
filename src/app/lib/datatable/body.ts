@@ -145,7 +145,7 @@ export class RowSettingsLoader implements OnInit, OnDestroy {
     <ng-template ngFor let-row [ngForOf]="value" let-even="even" let-odd="odd" let-rowIndex="index">
       <tr (click)="dt.handleRowClick($event, row, rowIndex)" (mouseenter)="onRowHover(rowIndex, true)" (mouseleave)="onRowHover(rowIndex, false)" [ngClass]="[dt.isSelected(row)? 'm-row-selected': '']">
         <td *ngIf="dt.selectionHandler == true">
-          <div class="m-body-td m-body-td--checkbox">
+          <div class="m-body-td m-body-td--checkbox" [ngClass]="[dt.selectionMode === 'single' ? 'single-select-table' : '']">
             <mat-checkbox [disabled]="row[dt.rowSelectableKey] !== undefined && row[dt.rowSelectableKey] === false" (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
           </div>
         </td>

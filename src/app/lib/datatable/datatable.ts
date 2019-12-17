@@ -49,6 +49,7 @@ import {
 import { MomentumTemplate } from './template.directive';
 import { Subscription } from 'rxjs/Subscription';
 import { Overlay } from '@angular/cdk/overlay';
+import {Observable} from "rxjs/Rx";
 
 @Component({
   selector: 'm-table',
@@ -67,7 +68,7 @@ import { Overlay } from '@angular/cdk/overlay';
     </mat-card>
   `,
   styles: [
-    `
+      `
       :host {
         display: block;
       }
@@ -263,7 +264,7 @@ export class DataTable
 
   columnsSubscription$: Subscription;
 
-  verticalScrollHandler;
+  verticalScrollSub$;
   propSet = false;
   overlayRef;
 
@@ -323,9 +324,12 @@ export class DataTable
     if (!elemsToFixed || elemsToFixed.length === 0) {
       return;
     }
-    scrollElement.removeEventListener('scroll', this.verticalScrollHandler);
-    this.verticalScrollHandler = this.headScrollFn.bind(this, threshold, elemsToFixed);
-    scrollElement.addEventListener('scroll', this.verticalScrollHandler, true);
+    if (this.verticalScrollSub$) {
+      this.verticalScrollSub$.unsubscribe();
+    }
+    this.verticalScrollSub$ = Observable.fromEvent(scrollElement, 'scroll').subscribe(res => {
+      this.headScrollFn(threshold, elemsToFixed);
+    });
   }
 
   headScrollFn(threshold, elemsToFixed) {
@@ -344,7 +348,7 @@ export class DataTable
   }
 
   setElemsFixed(elemsToFixed: HTMLHeadingElement[], top: number,
-                         threshold: number, setFixed = true) {
+                threshold: number, setFixed = true) {
     elemsToFixed.forEach((elem) => {
       if (!setFixed) {
         elem.removeAttribute('style');
@@ -1138,6 +1142,10 @@ export class DataTable
     if (this.overlayRef) {
       this.overlayRef.dispose();
       this.overlayRef = undefined;
+    }
+
+    if (this.verticalScrollSub$) {
+      this.verticalScrollSub$.unsubscribe();
     }
   }
 }

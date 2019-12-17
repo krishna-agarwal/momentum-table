@@ -49,7 +49,7 @@ import {
 import { MomentumTemplate } from './template.directive';
 import { Subscription } from 'rxjs/Subscription';
 import { Overlay } from '@angular/cdk/overlay';
-import {Observable} from "rxjs/Rx";
+import { fromEvent } from 'rxjs';
 
 @Component({
   selector: 'm-table',
@@ -327,7 +327,7 @@ export class DataTable
     if (this.verticalScrollSub$) {
       this.verticalScrollSub$.unsubscribe();
     }
-    this.verticalScrollSub$ = Observable.fromEvent(scrollElement, 'scroll').subscribe(res => {
+    this.verticalScrollSub$ = fromEvent(scrollElement, 'scroll').subscribe(res => {
       this.headScrollFn(threshold, elemsToFixed);
     });
   }

@@ -1134,6 +1134,11 @@ export class DataTable
     if (this.columnsSubscription$) {
       this.columnsSubscription$.unsubscribe();
     }
+
+    if (this.overlayRef) {
+      this.overlayRef.dispose();
+      this.overlayRef = undefined;
+    }
   }
 }
 

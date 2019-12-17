@@ -46,7 +46,7 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
         </div>
       </th>
       <th [hidden]="col.hidden" *ngFor="let col of columns;" (click)="dt.sort($event,col)"
-          [ngClass]="[col.colHeadClass ? col.colHeadClass : '', col.sortable ? 'm-sortable-column': '']">
+          [ngClass]="[col.colHeadClass ? col.colHeadClass : '', col.sortable ? 'm-sortable-column': '', col.fixed ? 'm-fixed-col': '']">
         <div class="m-header-th">
           <span *ngIf="!col.headerTemplate">{{ col.header }}</span>
           <span *ngIf="col.headerTemplate">
@@ -118,6 +118,11 @@ export class ColumnHeaderTemplateLoader implements OnInit, OnDestroy {
     .mat-checkbox-background {
       border: 4px solid #fff !important;
       transform: scale(0.8);
+    }
+    .m-fixed-col {
+      position: sticky;
+      left: 0;
+      z-index: 3 !important;
     }
   `,
   ],

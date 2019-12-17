@@ -149,7 +149,7 @@ export class RowSettingsLoader implements OnInit, OnDestroy {
             <mat-checkbox [disabled]="row[dt.rowSelectableKey] !== undefined && row[dt.rowSelectableKey] === false" (click)="dt.selectCheckboxClick($event)" (change)="dt.toggleRowWithCheckbox($event, row)" [checked]="dt.isSelected(row)"></mat-checkbox>
           </div>
         </td>
-        <td #cell (mouseenter)="onHover(colIndex, true)" (mouseleave)="onHover(colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index"  [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
+        <td #cell (mouseenter)="onHover(colIndex, true)" (mouseleave)="onHover(colIndex, false)" [hidden]="col.hidden" *ngFor="let col of columns; let colIndex = index"  [ngClass]="[col.colBodyClass ? col.colBodyClass : '', col.editable ? 'm-editable-column': '', (col.editable && col.editTrigger === 'cell') ? 'm-clickable' : '', col.fixed ? 'm-fixed-col' : '', hoverRowIndex === rowIndex ? 'm-fixed-col-hover' : '']" (click)="col.editTrigger === 'cell' && dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex)">
             <div class="m-cell-data" *ngIf="!col.bodyTemplate" [ngClass]="{'m-clickable':col.editable && col.editTrigger !== 'button'}">
               {{row[col.field]}}
               <button type="button" mat-icon-button [ngStyle]="{visibility: (colIndex == hoverCellIndex && rowIndex == hoverRowIndex) ? 'visible' : 'hidden'}" *ngIf="col.editable && col.editTrigger === 'button'" class="action-icon m-clickable" (click)="dt.switchCellToEditMode(cell,col,row,rowIndex,colIndex);"><mat-icon class="m-clickable">mode_edit</mat-icon></button>
@@ -270,6 +270,16 @@ export class RowSettingsLoader implements OnInit, OnDestroy {
         right: 0;
         padding: 0 1rem;
         line-height: calc(var(--row-height, 48px) - 1px);
+      }
+      .m-fixed-col {
+        position: sticky;
+        left: 0;
+        background: #fff;
+        z-index: 2;
+        transition: background-color 0.1s ease;
+      }
+      .m-fixed-col-hover {
+        background: #eeeeee;
       }
     `
   ]

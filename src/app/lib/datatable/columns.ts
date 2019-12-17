@@ -62,6 +62,7 @@ export class ColumnComponent implements AfterContentInit {
   @Input() colHeadClass: any;
   @Input() colSubHeadClass: any;
   @Input() colBodyClass: any;
+  @Input() fixed: boolean;
 
   @ContentChildren(MomentumTemplate) templates: QueryList<any>;
 

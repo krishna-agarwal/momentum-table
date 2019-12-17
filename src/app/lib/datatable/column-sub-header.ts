@@ -43,7 +43,7 @@ export class ColumnSubHeaderTemplateLoader implements OnInit, OnDestroy {
       <td *ngIf="dt.selectionHandler == true">
       </td>
       <td [hidden]="col.hidden" *ngFor="let col of columns;"
-          [ngClass]="[col.colSubHeadClass ? col.colSubHeadClass : '']">
+          [ngClass]="[col.colSubHeadClass ? col.colSubHeadClass : '',  col.fixed ? 'm-fixed-col': '']">
         <span *ngIf="!col.subHeaderTemplate">{{ col.subHeader }}</span>
         <span *ngIf="col.subHeaderTemplate">
           <m-columnSubHeaderTemplateLoader [column]="col"></m-columnSubHeaderTemplateLoader>
@@ -73,6 +73,12 @@ export class ColumnSubHeaderTemplateLoader implements OnInit, OnDestroy {
     }
     td:last-child{
       padding: var(--last-column-padding, 0 24px 0 0)
+    }
+    .m-fixed-col {
+      position: sticky;
+      left: 0;
+      z-index: 2 !important;
+      background: #fff;
     }
   `,
   ],

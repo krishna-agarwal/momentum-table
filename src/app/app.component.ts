@@ -68,6 +68,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     console.log('click', event);
   }
 
+  allRowTest(event) {
+    console.log('@@@@@@', event);
+  }
+
   rowSelect(event) {
     console.log('select', event);
   }

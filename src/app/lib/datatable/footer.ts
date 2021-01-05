@@ -102,11 +102,31 @@ export class FooterComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (this.dt.locale.paginator) {
-      const { itemsPerPageLabel, nextPageLabel, previousPageLabel } = this.dt.locale.paginator;
+      const { itemsPerPageLabel, nextPageLabel, previousPageLabel, rangeLabel } = this.dt.locale.paginator;
       itemsPerPageLabel ? this.paginator._intl.itemsPerPageLabel = itemsPerPageLabel : null;
       nextPageLabel ? this.paginator._intl.nextPageLabel = nextPageLabel : null;
       previousPageLabel ? this.paginator._intl.previousPageLabel = previousPageLabel : null;
+      rangeLabel ? this.paginator._intl.getRangeLabel = this.rangeLabelFunction.bind(this) : null;
     }
 
   }
+
+  rangeLabelFunction(page: number, pageSize: number, length: number) {
+    const {divider, of} = this.dt.locale.paginator.rangeLabel;
+    if (length === 0 || pageSize === 0) { return `0 ${of || 'of'} ${length}`; }
+
+    length = Math.max(length, 0);
+
+    const startIndex = page * pageSize;
+
+    const endIndex = startIndex < length ?
+      Math.min(startIndex + pageSize, length) :
+      startIndex + pageSize;
+
+    return `${startIndex + 1} ${divider || '-'} ${endIndex} ${of || 'of'} ${length}`;
+  }
+
+
 }
+
+

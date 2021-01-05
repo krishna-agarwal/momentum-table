@@ -140,6 +140,9 @@ export class DataTable
   @Output()
   onRowUnselect: EventEmitter<any> = new EventEmitter();
 
+  @Output()
+  onSelectAllToggle: EventEmitter<any> = new EventEmitter();
+
   @Input()
   expandable = false;
 
@@ -658,8 +661,13 @@ export class DataTable
   }
 
   toggleRowsWithCheckbox(event) {
-    if (event.checked) this.selection = this.value.slice();
-    else this.selection = [];
+    if (event.checked) {
+      this.selection = this.value.slice();
+      this.onSelectAllToggle.emit(this.selection);
+    } else {
+      this.onSelectAllToggle.emit(this.selection);
+      this.selection = [];
+    }
 
     this.selectionChange.emit(this.selection);
 

@@ -77,7 +77,7 @@ export class GlobalHeaderTemplateLoader
 
     <div *ngIf="!header.template" class="card-header">
       <div *ngIf="header.title && !dt.itemsSelected()" class="card-header-title">{{header.title}}</div>
-      <div *ngIf="dt.itemsSelected()" class="card-header-selection-count">{{dt.itemsSelected()}} item(s) selected</div>
+      <div *ngIf="dt.itemsSelected()" class="card-header-selection-count">{{selectedItemsLabel()}}</div>
       <div class="tool-box">
         <div class="search-setting-wrapper" *ngIf="header.globalSearch">
           <div *ngIf="header.searchField == 'line'" class="line-search">
@@ -277,6 +277,15 @@ export class HeaderComponent implements AfterViewInit, OnDestroy {
     this.colSettingOpen = true;
     this.colToggleClick = true;
     this.bindDocumentEditListener();
+  }
+
+  selectedItemsLabel() {
+    if (this.dt.locale && this.dt.locale.itemSelected) {
+      return this.dt.locale.itemSelected.replace('n', this.dt.itemsSelected());
+    } else {
+      return `${this.dt.itemsSelected()} item(s) selected`;
+    }
+
   }
 
   closeColSetting() {

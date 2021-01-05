@@ -1,6 +1,7 @@
 <m-table class="test" [value]=countries
          [sortField]="'country'" [sortOrder]="1" [sortLocal]="true" (onSort)="changeSort($event)"
          (onRowClick)="rowClick($event)"
+         (onSelectAllToggle)="allRowTest($event)"
          [selectable]="true" [selectionMode]="'multiple'" [selectionHandler]="true" (onRowSelect)="rowSelect($event)" (onRowUnselect)="rowUnselect($event)" (selectionChange)="onSelectionChange($event)" [(selection)]="selectedRows"
          [rowSelectableKey]="'selectable'"
          [expandable]="true" [expandMultiple]="true" (onRowExpand)="rowExpanded($event)" (onRowCollapse)="rowCollapse($event)"

@@ -663,10 +663,10 @@ export class DataTable
   toggleRowsWithCheckbox(event) {
     if (event.checked) {
       this.selection = this.value.slice();
-      this.onSelectAllToggle.emit(this.selection);
+      this.onSelectAllToggle.emit({checked: true, data: this.selection});
     } else {
-      this.onSelectAllToggle.emit(this.selection);
       this.selection = [];
+      this.onSelectAllToggle.emit({checked: false});
     }
 
     this.selectionChange.emit(this.selection);

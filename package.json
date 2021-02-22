@@ -1,6 +1,6 @@
 {
   "name": "momentum-table",
-  "version": "1.9.8",
+  "version": "1.9.9",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
